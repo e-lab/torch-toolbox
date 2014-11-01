@@ -95,7 +95,7 @@ static void video_transmitter_rgbp_yuv420p(AVFrame *rgb, AVFrame *yuv)
 /*
  * Encode video frame for transmission. Written by Marko Vitez
  */
-static int avcodec_transmitter_encode_video2(AVCodecContext *avctx, AVPacket *avpkt, const AVFrame *frame, int *got_packet_ptr)
+static int avcodec_encode_video2(AVCodecContext *avctx, AVPacket *avpkt, const AVFrame *frame, int *got_packet_ptr)
 {
 	int out_size = avcodec_encode_video(avctx, video_outbuf, video_outbuf_size, frame);
 
@@ -292,7 +292,7 @@ static int video_transmitter_forward(lua_State * L)
 	pFrame_yuv->pts = frame_count;
 
 	/* decode and sent each frame */
-	rc = avcodec_transmitter_encode_video2(pCodecCtx, &packet_tx, pFrame_yuv, &got_packet);
+	rc = avcodec_encode_video2(pCodecCtx, &packet_tx, pFrame_yuv, &got_packet);
 	if(!rc && got_packet) {
 		writestarted = 1;
 		av_write_frame(pFormatCtx, &packet_tx);
