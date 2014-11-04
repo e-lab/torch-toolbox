@@ -139,6 +139,73 @@ static void video_decoder_yuv420p_rgbp(AVFrame * yuv, AVFrame * rgb)
 	}
 }
 
+/* This function is a main function for converting color space from yuv422p to planar RGB.
+ * It utilizes a lookup table method for fast conversion. Written by Marko Vitez.
+ */
+static void video_decoder_yuv422p_rgbp(AVFrame * yuv, AVFrame * rgb)
+{
+	int i, j, U, V, Y, YUR, YUG, YUB;
+	int h = yuv->height;
+	int w = yuv->width;
+	int wy = yuv->linesize[0];
+	int wu = yuv->linesize[1];
+	int wv = yuv->linesize[2];
+	uint8_t *r = rgb->data[0];
+	uint8_t *g = rgb->data[1];
+	uint8_t *b = rgb->data[2];
+	uint8_t *y = yuv->data[0];
+	uint8_t *u = yuv->data[1];
+	uint8_t *v = yuv->data[2];
+	uint8_t *r1, *g1, *b1, *y1;
+	w /= 2;
+
+	/* convert for R channel */
+	for (i = 0; i < h; i++) {
+		for (j = 0; j < w; j++) {
+			y1    = y + i*wy + 2*j;
+			V     = v[j + i * wv];
+			YUR   = TB_YUR[V];
+			r1    = (uint8_t *) r + 2*(w*i + j);
+
+			Y     = TB_Y[y1[0]];
+			*r1++ = TB_SAT[Y + YUR + 1024];
+			Y     = TB_Y[y1[1]];
+			*r1   = TB_SAT[Y + YUR + 1024];
+		}
+	}
+
+	/* convert for G channel */
+	for (i = 0; i < h; i++) {
+		for (j = 0; j < w; j++) {
+			y1    = y + i*wy + 2*j;
+			U     = u[j + i * wu];
+			V     = v[j + i * wv];
+			YUG   = TB_YUGU[U] + TB_YUGV[V];
+			g1    = (uint8_t *) g + 2*(w*i + j);
+
+			Y     = TB_Y[y1[0]];
+			*g1++ = TB_SAT[Y + YUG + 1024];
+			Y     = TB_Y[y1[1]];
+			*g1   = TB_SAT[Y + YUG + 1024];
+		}
+	}
+
+	/* convert for B channel */
+	for (i = 0; i < h; i++) {
+		for (j = 0; j < w; j++) {
+			y1    = y + i*wy + 2*j;
+			U     = u[j + i * wu];
+			YUB   = TB_YUB[U];
+			b1    = (uint8_t *) b + 2*(w*i + j);
+
+			Y     = TB_Y[y1[0]];
+			*b1++ = TB_SAT[Y + YUB + 1024];
+			Y     = TB_Y[y1[1]];
+			*b1   = TB_SAT[Y + YUB + 1024];
+		}
+	}
+}
+
 /* This function is a main function for converting color space from yuv420p to planar YUV.
  * Written by Marko Vitez.
  */
@@ -203,6 +270,7 @@ int video_decoder_exit(lua_State * L)
 	}
 	if (pFormatCtx)
 		avformat_close_input(&pFormatCtx);
+	pFormatCtx = 0;
 
 	return 0;
 }
@@ -373,7 +441,9 @@ static int video_decoder_rgb(lua_State * L)
 			if (frame_decoded) {
 
 				/* convert YUV420p to planar RGB */
-				video_decoder_yuv420p_rgbp(pFrame_yuv, pFrame_intm);
+				if(pCodecCtx->pix_fmt == PIX_FMT_YUV422P || pCodecCtx->pix_fmt == PIX_FMT_YUVJ422P)
+					video_decoder_yuv422p_rgbp(pFrame_yuv, pFrame_intm);
+				else video_decoder_yuv420p_rgbp(pFrame_yuv, pFrame_intm);
 
 				/* copy each channel from av_malloc to DMA_malloc */
 				for (c = 0; c < dim; c++)
@@ -462,11 +532,120 @@ static int video_decoder_yuv(lua_State * L)
 	return 1;
 }
 
+static int startremux(lua_State *L)
+{
+	const char *destpath = lua_tostring(L, 1);
+	const char *dstformat = lua_tostring(L, 2);
+	AVFormatContext *ofmt_ctx;
+	AVPacket pkt;
+	int ret, i;
+
+	if(!pFormatCtx)
+	{
+		fprintf(stderr, "Call init first\n");
+		lua_pushboolean(L, 0);
+		return 1;
+	}
+	// Create the output context
+	ofmt_ctx = avformat_alloc_context();
+	if(!ofmt_ctx)
+	{
+		fprintf(stderr, "Error allocating format context\n");
+		lua_pushboolean(L, 0);
+		return 1;
+	}
+	ofmt_ctx->oformat = av_guess_format(dstformat, 0, 0);
+	if(!ofmt_ctx->oformat)
+	{
+		avformat_free_context(ofmt_ctx);
+		fprintf(stderr, "Unrecognixed output format %s\n", dstformat);
+		lua_pushboolean(L, 0);
+		return 1;
+	}
+	ofmt_ctx->priv_data = NULL;
+	// Open the output file
+	strncpy(ofmt_ctx->filename, destpath, sizeof(ofmt_ctx->filename));
+	if(avio_open(&ofmt_ctx->pb, destpath, AVIO_FLAG_WRITE) < 0)
+	{
+		fprintf(stderr, "Error creating output file %s\n", destpath);
+		avformat_free_context(ofmt_ctx);
+		lua_pushboolean(L, 0);
+		return 1;
+	}
+	// Copy the stream contexts
+	for (i = 0; i < pFormatCtx->nb_streams; i++) {
+		AVStream *in_stream = pFormatCtx->streams[i];
+		AVStream *out_stream = avformat_new_stream(ofmt_ctx, in_stream->codec->codec);
+		if (!out_stream) {
+			fprintf(stderr, "Failed allocating output stream\n");
+			avformat_free_context(ofmt_ctx);
+			lua_pushboolean(L, 0);
+			return 1;
+		}
+
+		ret = avcodec_copy_context(out_stream->codec, in_stream->codec);
+		if (ret < 0) {
+			fprintf(stderr, "Failed to copy context from input to output stream codec context\n");
+			avformat_free_context(ofmt_ctx);
+			lua_pushboolean(L, 0);
+			return 1;
+		}
+		out_stream->codec->codec_tag = 0;
+		if (ofmt_ctx->oformat->flags & AVFMT_GLOBALHEADER)
+			out_stream->codec->flags |= CODEC_FLAG_GLOBAL_HEADER;
+		}
+		ret = avformat_write_header(ofmt_ctx, NULL);
+		if (ret < 0) {
+			fprintf(stderr, "Error writing header\n");
+		avformat_free_context(ofmt_ctx);
+		lua_pushboolean(L, 0);
+		return 1;
+	}
+
+	while (1) {
+		AVStream *in_stream, *out_stream;
+
+		ret = av_read_frame(pFormatCtx, &pkt);
+		if (ret < 0)
+			break;
+
+		in_stream  = pFormatCtx->streams[pkt.stream_index];
+		out_stream = ofmt_ctx->streams[pkt.stream_index];
+
+		pkt.duration = av_rescale_q(pkt.duration, in_stream->time_base, out_stream->time_base);
+		pkt.pos = -1;
+
+		ret = av_interleaved_write_frame(ofmt_ctx, &pkt);
+		if (ret < 0) {
+			fprintf(stderr, "Error muxing packet\n");
+			break;
+		}
+		av_free_packet(&pkt);
+	}
+
+	av_write_trailer(ofmt_ctx);
+
+	/* close output */
+	if (ofmt_ctx && !(ofmt_ctx->flags & AVFMT_NOFILE))
+		avio_close(ofmt_ctx->pb);
+	avformat_free_context(ofmt_ctx);
+
+	if (ret < 0 && ret != AVERROR_EOF) {
+		fprintf(stderr, "Error %d occurred\n", ret);
+		lua_pushboolean(L, 0);
+		return 1;
+	}
+
+	lua_pushboolean(L, 1);
+	return 1;
+}
+
 static const struct luaL_reg video_decoder[] = {
 	{"init", video_decoder_init},
 	{"frame_rgb", video_decoder_rgb},
 	{"frame_yuv", video_decoder_yuv},
 	{"exit", video_decoder_exit},
+	{"writeto", startremux},
 	{NULL, NULL}
 };
 

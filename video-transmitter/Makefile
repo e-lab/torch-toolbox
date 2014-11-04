@@ -1,13 +1,18 @@
+UNAME_S := $(shell uname -s)
 UNAME_P := $(shell uname -p)
 
 INCLUDE = -I. -I/usr/local/include
-LDFLAGS := -lavutil -lavformat -lavcodec -lTH -lluajit -lluaT
+LDFLAGS := -lavutil -lavformat -lavcodec
 LIBOPTS = -shared -L/usr/local/lib/lua/5.1 -L/usr/local/lib/
 CFLAGS = -O3 -fopenmp -c -fpic -Wall
 CC = gcc
 
 ifneq ($(filter arm%,$(UNAME_P)),)
 	CFLAGS += -mfpu=neon
+endif
+
+ifeq ($(UNAME_S),Darwin)
+	LDFLAGS += -lTH -lluajit -lluaT
 endif
 
 

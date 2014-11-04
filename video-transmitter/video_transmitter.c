@@ -95,7 +95,7 @@ static void video_transmitter_rgbp_yuv420p(AVFrame *rgb, AVFrame *yuv)
 /*
  * Encode video frame for transmission. Written by Marko Vitez
  */
-static int avcodec_encode_video2(AVCodecContext *avctx, AVPacket *avpkt, const AVFrame *frame, int *got_packet_ptr)
+int avcodec_encode_video2(AVCodecContext *avctx, AVPacket *avpkt, const AVFrame *frame, int *got_packet_ptr)
 {
 	int out_size = avcodec_encode_video(avctx, video_outbuf, video_outbuf_size, frame);
 
