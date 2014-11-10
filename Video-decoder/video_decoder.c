@@ -18,6 +18,7 @@
 #include <libavcodec/avcodec.h>
 #include <libavformat/avformat.h>
 #include <libavutil/mathematics.h>
+#include <pthread.h>
 
 /* video decoder on DMA memory */
 static int stream_idx;
@@ -25,6 +26,11 @@ static AVFormatContext *pFormatCtx;
 static AVCodecContext *pCodecCtx;
 static AVFrame *pFrame_yuv;
 static AVFrame *pFrame_intm;
+static AVFormatContext *ofmt_ctx;
+static char destfile[255], *destext, destformat[100];
+static pthread_t rx_tid;
+static int rx_active, frame_decoded;
+static pthread_mutex_t readmutex = PTHREAD_MUTEX_INITIALIZER;
 
 /* yuv420p-to-rgbp lookup table */
 static short TB_YUR[256], TB_YUB[256], TB_YUGU[256], TB_YUGV[256], TB_Y[256];
@@ -253,6 +259,13 @@ static void video_decoder_yuv420p_yuvp(AVFrame * yuv420, AVFrame * yuv)
  */
 int video_decoder_exit(lua_State * L)
 {
+	if(rx_tid)
+	{
+		void *retval;
+		rx_active = 0;
+		pthread_join(rx_tid, &retval);
+		rx_tid = 0;
+	}
 	/* free the AVFrame structures */
 	if (pFrame_intm) {
 		av_free(pFrame_intm);
@@ -271,7 +284,7 @@ int video_decoder_exit(lua_State * L)
 	if (pFormatCtx)
 		avformat_close_input(&pFormatCtx);
 	pFormatCtx = 0;
-
+	frame_decoded = 0;
 	return 0;
 }
 
@@ -397,7 +410,7 @@ static int video_decoder_init(lua_State * L)
 static int video_decoder_rgb(lua_State * L)
 {
 	AVPacket packet;
-	int c, frame_decoded;
+	int c;
 	int dim = 0;
 	long *stride = NULL;
 	long *size = NULL;
@@ -429,6 +442,34 @@ static int video_decoder_rgb(lua_State * L)
 	}
 
 	/* read frames and save first five frames to disk */
+	if(rx_tid)
+	{
+		if(!frame_decoded)
+		{
+			while(rx_tid && !frame_decoded)
+				usleep(10000);
+		}
+		pthread_mutex_lock(&readmutex);
+		if(!frame_decoded)
+		{
+			pthread_mutex_unlock(&readmutex);
+			lua_pushboolean(L, 0);
+			return 1;
+		}
+		if(pCodecCtx->pix_fmt == PIX_FMT_YUV422P || pCodecCtx->pix_fmt == PIX_FMT_YUVJ422P)
+			video_decoder_yuv422p_rgbp(pFrame_yuv, pFrame_intm);
+		else video_decoder_yuv420p_rgbp(pFrame_yuv, pFrame_intm);
+		pthread_mutex_unlock(&readmutex);
+
+		/* copy each channel from av_malloc to DMA_malloc */
+		for (c = 0; c < dim; c++)
+			memcpy(dst_byte + c * stride[0],
+				   pFrame_intm->data[c],
+				   size[1] * size[2]);
+
+		lua_pushboolean(L, 1);
+		return 1;
+	}
 	while (av_read_frame(pFormatCtx, &packet) >= 0) {
 
 		/* is this a packet from the video stream? */
@@ -467,7 +508,7 @@ static int video_decoder_rgb(lua_State * L)
 static int video_decoder_yuv(lua_State * L)
 {
 	AVPacket packet;
-	int c, frame_decoded;
+	int c;
 	int dim = 0;
 	long *stride = NULL;
 	long *size = NULL;
@@ -532,46 +573,33 @@ static int video_decoder_yuv(lua_State * L)
 	return 1;
 }
 
-static int startremux(lua_State *L)
+static AVFormatContext *openoutput(const char *destpath, const char *destformat)
 {
-	const char *destpath = lua_tostring(L, 1);
-	const char *dstformat = lua_tostring(L, 2);
 	AVFormatContext *ofmt_ctx;
-	AVPacket pkt;
-	int ret, i;
+	int i, ret;
 
-	if(!pFormatCtx)
-	{
-		fprintf(stderr, "Call init first\n");
-		lua_pushboolean(L, 0);
-		return 1;
-	}
-	// Create the output context
 	ofmt_ctx = avformat_alloc_context();
-	if(!ofmt_ctx)
-	{
+	if(!ofmt_ctx) {
 		fprintf(stderr, "Error allocating format context\n");
-		lua_pushboolean(L, 0);
-		return 1;
+		return 0;
 	}
-	ofmt_ctx->oformat = av_guess_format(dstformat, 0, 0);
-	if(!ofmt_ctx->oformat)
-	{
+
+	ofmt_ctx->oformat = av_guess_format(destformat, 0, 0);
+	if(!ofmt_ctx->oformat) {
 		avformat_free_context(ofmt_ctx);
-		fprintf(stderr, "Unrecognixed output format %s\n", dstformat);
-		lua_pushboolean(L, 0);
-		return 1;
+		fprintf(stderr, "Unrecognixed output format %s\n", destformat);
+		return 0;
 	}
 	ofmt_ctx->priv_data = NULL;
+
 	// Open the output file
 	strncpy(ofmt_ctx->filename, destpath, sizeof(ofmt_ctx->filename));
-	if(avio_open(&ofmt_ctx->pb, destpath, AVIO_FLAG_WRITE) < 0)
-	{
+	if(avio_open(&ofmt_ctx->pb, destpath, AVIO_FLAG_WRITE) < 0) {
 		fprintf(stderr, "Error creating output file %s\n", destpath);
 		avformat_free_context(ofmt_ctx);
-		lua_pushboolean(L, 0);
-		return 1;
+		return 0;
 	}
+
 	// Copy the stream contexts
 	for (i = 0; i < pFormatCtx->nb_streams; i++) {
 		AVStream *in_stream = pFormatCtx->streams[i];
@@ -579,46 +607,99 @@ static int startremux(lua_State *L)
 		if (!out_stream) {
 			fprintf(stderr, "Failed allocating output stream\n");
 			avformat_free_context(ofmt_ctx);
-			lua_pushboolean(L, 0);
-			return 1;
+			return 0;
 		}
 
 		ret = avcodec_copy_context(out_stream->codec, in_stream->codec);
 		if (ret < 0) {
 			fprintf(stderr, "Failed to copy context from input to output stream codec context\n");
 			avformat_free_context(ofmt_ctx);
-			lua_pushboolean(L, 0);
-			return 1;
+			return 0;
 		}
+
+		out_stream->sample_aspect_ratio = out_stream->codec->sample_aspect_ratio;
 		out_stream->codec->codec_tag = 0;
+		out_stream->codec->time_base.num = 1;
+		out_stream->codec->time_base.den = 90000;
+
 		if (ofmt_ctx->oformat->flags & AVFMT_GLOBALHEADER)
 			out_stream->codec->flags |= CODEC_FLAG_GLOBAL_HEADER;
-		}
-		ret = avformat_write_header(ofmt_ctx, NULL);
-		if (ret < 0) {
-			fprintf(stderr, "Error writing header\n");
-		avformat_free_context(ofmt_ctx);
-		lua_pushboolean(L, 0);
-		return 1;
 	}
 
-	while (1) {
+	ret = avformat_write_header(ofmt_ctx, NULL);
+	if (ret < 0) {
+		char s[300];
+		av_strerror(ret, s, sizeof(s));
+		fprintf(stderr, "Error writing header: %s\n", s);
+		avformat_free_context(ofmt_ctx);
+		return 0;
+	}
+	return ofmt_ctx;
+}
+
+void *rxthread(void *dummy)
+{
+	char s[300];
+	AVPacket pkt;
+	int64_t start = -1;
+	int64_t fragmentsize;
+	int ret = 0;
+	struct tm tm;
+	time_t t;
+
+	fragmentsize = 300 * pFormatCtx->streams[stream_idx]->time_base.den /
+		pFormatCtx->streams[stream_idx]->time_base.num;
+
+	while (rx_active) {
 		AVStream *in_stream, *out_stream;
 
 		ret = av_read_frame(pFormatCtx, &pkt);
 		if (ret < 0)
 			break;
 
+		if (pkt.stream_index == stream_idx) {
+			/* decode video frame */
+			pthread_mutex_lock(&readmutex);
+			avcodec_decode_video2(pCodecCtx, pFrame_yuv, &frame_decoded, &pkt);
+			pthread_mutex_unlock(&readmutex);
+		}
+
 		in_stream  = pFormatCtx->streams[pkt.stream_index];
 		out_stream = ofmt_ctx->streams[pkt.stream_index];
 
 		pkt.duration = av_rescale_q(pkt.duration, in_stream->time_base, out_stream->time_base);
+		pkt.pts = av_rescale_q(pkt.pts, in_stream->time_base, out_stream->time_base);
+		pkt.dts = av_rescale_q(pkt.dts, in_stream->time_base, out_stream->time_base);
 		pkt.pos = -1;
+
+		if(start == -1)
+			start = pkt.dts;
+		if(pkt.stream_index == stream_idx && pkt.dts > start + fragmentsize &&
+			pkt.flags & AV_PKT_FLAG_KEY)
+		{
+			av_write_trailer(ofmt_ctx);
+
+			/* close output */
+			if (ofmt_ctx && !(ofmt_ctx->flags & AVFMT_NOFILE))
+				avio_close(ofmt_ctx->pb);
+
+			avformat_free_context(ofmt_ctx);
+			time(&t);
+			tm = *localtime(&t);
+			sprintf(s, "%s_%04d%02d%02d-%02d%02d%02d.%s", destfile, 1900 + tm.tm_year, tm.tm_mon+1, tm.tm_mday,
+				tm.tm_hour, tm.tm_min, tm.tm_sec, destext);
+			ofmt_ctx = openoutput(s, destformat);
+
+			if(!ofmt_ctx)
+				return 0;
+
+			start = pkt.dts;
+		}
 
 		ret = av_interleaved_write_frame(ofmt_ctx, &pkt);
 		if (ret < 0) {
-			fprintf(stderr, "Error muxing packet\n");
-			break;
+			av_strerror(ret, s, sizeof(s));
+			fprintf(stderr, "Error muxing packet: %s\n", s);
 		}
 		av_free_packet(&pkt);
 	}
@@ -631,12 +712,74 @@ static int startremux(lua_State *L)
 	avformat_free_context(ofmt_ctx);
 
 	if (ret < 0 && ret != AVERROR_EOF) {
-		fprintf(stderr, "Error %d occurred\n", ret);
+		av_strerror(ret, s, sizeof(s));
+		fprintf(stderr, "Error %d occurred: %s\n", ret, s);
+		return 0;
+	}
+
+	return 0;
+}
+
+static int startremux(lua_State *L)
+{
+	char s[300];
+	struct tm tm;
+	time_t t;
+
+	if(rx_tid) {
+		fprintf(stderr, "Another rx already in progress\n");
 		lua_pushboolean(L, 0);
 		return 1;
 	}
 
+	if(!pFormatCtx) {
+		fprintf(stderr, "Call init first\n");
+		lua_pushboolean(L, 0);
+		return 1;
+	}
+
+	strcpy(destfile, lua_tostring(L, 1));
+	strcpy(destformat, lua_tostring(L, 2));
+	destext = strrchr(destfile, '.');
+
+	if(!destext) {
+		destext = "";
+	} else {
+		*destext++ = 0;
+	}
+
+	time(&t);
+	tm = *localtime(&t);
+	sprintf(s, "%s_%04d%02d%02d-%02d%02d%02d.%s", destfile, 1900 + tm.tm_year, tm.tm_mon+1, tm.tm_mday,
+		tm.tm_hour, tm.tm_min, tm.tm_sec, destext);
+	ofmt_ctx = openoutput(s, destformat);
+
+	if(!ofmt_ctx) {
+		lua_pushboolean(L, 0);
+		return 1;
+	}
+
+	rx_active = 1;
+	pthread_create(&rx_tid, 0, rxthread, 0);
 	lua_pushboolean(L, 1);
+
+	return 1;
+}
+
+static int stopremux(lua_State *L)
+{
+	void *retval;
+
+	if(!rx_tid) {
+		fprintf(stderr, "Rx not active\n");
+		lua_pushboolean(L, 0);
+		return 1;
+	}
+	rx_active = 0;
+	pthread_join(rx_tid, &retval);
+	rx_tid = 0;
+	lua_pushboolean(L, 1);
+
 	return 1;
 }
 
@@ -645,7 +788,8 @@ static const struct luaL_reg video_decoder[] = {
 	{"frame_rgb", video_decoder_rgb},
 	{"frame_yuv", video_decoder_yuv},
 	{"exit", video_decoder_exit},
-	{"writeto", startremux},
+	{"startrx", startremux},
+	{"stoprx", stopremux},
 	{NULL, NULL}
 };
 
