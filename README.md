@@ -8,3 +8,4 @@ A collection of snippets and libraries for Torch from Purdue [e-Lab](http://engi
  - [Convert-MM](Convert-MM) to replace the ConvolutionMM with Convolution to support stride on CPU
  - [Video-decoder](Video-decoder) to receive and decode video from various sources
  - [Video-transmitter](Video-transmitter) to encode and transmit video on the fly
+ - [Tutorials](Tutorials) to help you set up Torch-related environment
