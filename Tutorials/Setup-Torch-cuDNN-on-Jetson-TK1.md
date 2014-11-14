@@ -110,4 +110,5 @@ net = net:cuda()
 
 local input = torch.Tensor(128, 3, 231, 231):cuda()
 net:forward(input)
+cutorch.synchronize()
 ```
