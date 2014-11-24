@@ -71,7 +71,13 @@ Detach your TK1 from host and reboot as a stand-alone system.
 ### Set up basic configurations on TK1 device
 
 Please set up basic configurations at your preference on TK1 device.
-For example,
+First, allow community-maintained open-source softwares.
+
+```
+sudo add-apt-repository universe
+```
+
+Then,
 
 ```sh
 date --set="Fri Nov 21 01:23:45 EST 2014"
