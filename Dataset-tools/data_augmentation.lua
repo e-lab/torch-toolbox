@@ -2,31 +2,24 @@
 -- Date: December, 2014
 require 'image'
 
-function imagesFolder(pathToFolder)
+require 'pl'
+require 'trepl'
+
+opt = lapp[[
+   -h,--hflip              (default true)        horizontal flip
+   -j,--jitter             (default 20  )        translation length
+   -p,--pathToFolder       (default 'images')        L2 penalty on the weights
+]]
+
+if not paths.dir(opt.pathToFolder) then
+  error(string.format("the folder %s not exist", opt.pathToFolder))
+end
 
 
-   local jitter  = 50
-   local image_names = paths.dir(pathToFolder, 'r')
-   os.execute("mkdir -p " .. pathToFolder .. "/augmentations")
-   local aug_path = pathToFolder .. "/augmentations"
 
-   for i=1, #image_names do
-
-    local tmp_img = image_names[i]
-    if (string.sub(tmp_img, 1, 1) ~= '.' and tmp_img ~= 'augmentations') then
-       hflip(pathToFolder, tmp_img, aug_path)
-       crop4(pathToFolder, tmp_img, aug_path, jitter)
-    end
-   end
-
-
- end
-
-
-function hflip(path_img, tmp_img, aug_path)
+function hflip_img(path_img, tmp_img, aug_path)
 
   local tmp_path = path_img .. "/" .. tmp_img
-  print(tmp_path)
   local img = image.load(tmp_path)
   local img_flip = image.hflip(img)
 
@@ -38,7 +31,7 @@ function hflip(path_img, tmp_img, aug_path)
 end
 
 
-function crop4(path_img, tmp_img, aug_path, jitter)
+function crop4_img(path_img, tmp_img, aug_path, jitter)
 
   local tmp_path = path_img .. "/" .. tmp_img
   local img = image.load(tmp_path)
@@ -61,6 +54,22 @@ function crop4(path_img, tmp_img, aug_path, jitter)
      end
    end
 
+end
+
+
+
+
+local image_names = paths.dir(opt.pathToFolder, 'r')
+os.execute("mkdir -p " .. opt.pathToFolder .. "/augmentations")
+local aug_path = opt.pathToFolder .. "/augmentations"
+
+for i=1, #image_names do
+
+  local tmp_img = image_names[i]
+  if (string.sub(tmp_img, 1, 1) ~= '.' and tmp_img ~= 'augmentations') then
+      hflip_img(opt.pathToFolder, tmp_img, aug_path)
+      crop4_img(opt.pathToFolder, tmp_img, aug_path, opt.jitter)
+  end
 end
 
 
