@@ -33,7 +33,9 @@ function convert(network)
                new_network:add(network.modules[i])
             end
          elseif network.modules[i].__typename == 'nn.Dropout' then
-            -- do nothing
+            -- turn of the training
+            network.modules[i].train = false
+            new_network:add(network.modules[i])
          else
             new_network:add(network.modules[i])
          end

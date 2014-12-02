@@ -37,7 +37,9 @@ function convert(network)
             input = tmp_module:forward(input)
 
          elseif network.modules[i].__typename == 'nn.Dropout' then
-            -- do nothing
+            -- turn of the dropping
+            network.modules[i].train = false
+            new_network:add(network.modules[i])
          else
             new_network:add(network.modules[i])
             input = network.modules[i]:forward(input)
