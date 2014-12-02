@@ -57,8 +57,6 @@ function crop4_img(path_img, tmp_img, aug_path, jitter)
 end
 
 
-
-
 local image_names = paths.dir(opt.pathToFolder, 'r')
 os.execute("mkdir -p " .. opt.pathToFolder .. "/augmentations")
 local aug_path = opt.pathToFolder .. "/augmentations"
@@ -67,8 +65,12 @@ for i=1, #image_names do
 
   local tmp_img = image_names[i]
   if (string.sub(tmp_img, 1, 1) ~= '.' and tmp_img ~= 'augmentations') then
-      hflip_img(opt.pathToFolder, tmp_img, aug_path)
-      crop4_img(opt.pathToFolder, tmp_img, aug_path, opt.jitter)
+      if opt.hflip == true then
+         hflip_img(opt.pathToFolder, tmp_img, aug_path)
+      end
+      if opt.jitter > 0 then
+         crop4_img(opt.pathToFolder, tmp_img, aug_path, opt.jitter)
+      end
   end
 end
 
