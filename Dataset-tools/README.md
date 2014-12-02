@@ -3,6 +3,8 @@ Dataset-tools
 
 
 ## data_augmentation
+This file get a folder with .jpg images and creates another folder inside 'augmentations' and saves augmented images in that folder.
+
 To flip the images only 
 
 ```lua
