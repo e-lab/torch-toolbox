@@ -8,7 +8,7 @@ require 'trepl'
 opt = lapp[[
    -h,--hflip              (default true)        horizontal flip
    -j,--jitter             (default 20  )        translation length
-   -p,--pathToFolder       (default 'images')        L2 penalty on the weights
+   -p,--pathToFolder       (default 'images')    path to the folder of images
 ]]
 
 if not paths.dir(opt.pathToFolder) then
