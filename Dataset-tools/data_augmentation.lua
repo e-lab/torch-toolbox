@@ -49,8 +49,13 @@ function crop4_img(path_img, tmp_img, aug_path, jitter)
   for i=1, 2 do
     for j=1, 2 do
        local sample = img[{{}, {1+ (j-1) * jitter, (j-1) * jitter + w}, {1+ (i-1) * jitter, (i-1) * jitter + h}}]
-       local img_path = aug_path .. "/" .. tmp_img .. "crop" .. j+i .. ".jpg"
+       local img_path = aug_path .. "/" .. tmp_img .. "crop" .. (j+(i-1)*2) .. ".jpg"
        image.save(img_path, sample)
+
+       if opt.hflip == true then
+         hflip_img(aug_path, tmp_img .. "crop" .. (j+(i-1)*2) .. ".jpg", aug_path)
+       end
+
      end
    end
 
@@ -65,11 +70,10 @@ for i=1, #image_names do
 
   local tmp_img = image_names[i]
   if (string.sub(tmp_img, 1, 1) ~= '.' and tmp_img ~= 'augmentations') then
-      if opt.hflip == true then
-         hflip_img(opt.pathToFolder, tmp_img, aug_path)
-      end
       if opt.jitter > 0 then
          crop4_img(opt.pathToFolder, tmp_img, aug_path, opt.jitter)
+      elseif opt.hflip == true then
+         hflip_img(opt.pathToFolder, tmp_img, aug_path)
       end
   end
 end
