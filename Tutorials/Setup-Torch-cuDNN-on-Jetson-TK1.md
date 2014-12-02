@@ -17,7 +17,7 @@ wget http://developer.download.nvidia.com/mobile/tegra/l4t/r21.1.0/Tegra124_Linu
 Then, change the NVIDIA-INSTALLER script so as to grab the latest driver you just downloaded.
 
 ```
-sudo vim ~/NVIDIA-INSTALLER/install.sh
+sudo vim ~/NVIDIA-INSTALLER/installer.sh
 ```
 
 Modify the filename in two spots as follows
