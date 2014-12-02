@@ -9,3 +9,4 @@ A collection of snippets and libraries for Torch from Purdue [e-Lab](http://engi
  - [Video-decoder](Video-decoder) to receive and decode video from various sources
  - [Video-transmitter](Video-transmitter) to encode and transmit video on the fly
  - [Tutorials](Tutorials) to help you set up Torch-related environment
+ - [Dataset-tools](Dataset-tools) to augment folder of images
