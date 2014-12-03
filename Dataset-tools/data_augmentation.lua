@@ -8,6 +8,7 @@ require 'trepl'
 opt = lapp[[
    -h,--hflip              (default true)        horizontal flip
    -j,--jitter             (default 20  )        translation length
+   -r,--rotate             (default 0.1)         degree of rotation
    -p,--pathToFolder       (default 'images')    path to the folder of images
 ]]
 
@@ -27,6 +28,19 @@ function hflip_img(path_img, tmp_img, aug_path)
   tmp_img = string.sub(tmp_img, 1, -5)
   local img_path = aug_path .. "/" .. tmp_img .. "flip.jpg"
   image.save(img_path, img_flip)
+
+end
+
+function rotate_img(path_img, tmp_img, aug_path, degree)
+
+  local tmp_path = path_img .. "/" .. tmp_img
+  local img = image.load(tmp_path)
+  local img_rotate = image.rotate(img, degree)
+
+  -- assumes .jpg ending for now
+  tmp_img = string.sub(tmp_img, 1, -5)
+  local img_path = aug_path .. "/" .. tmp_img .. "rotate.jpg"
+  image.save(img_path, img_rotate)
 
 end
 
@@ -85,6 +99,10 @@ for i=1, #image_names do
          crop5_img(opt.pathToFolder, tmp_img, aug_path, opt.jitter)
       elseif opt.hflip == true then
          hflip_img(opt.pathToFolder, tmp_img, aug_path)
+      end
+
+      if opt.rotate > 0 then
+         rotate_img(opt.pathToFolder, tmp_img, aug_path, opt.rotate)
       end
   end
 end
