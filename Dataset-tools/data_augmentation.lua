@@ -7,7 +7,8 @@ require 'trepl'
 
 opt = lapp[[
    -h,--hflip              (default true)        horizontal flip
-   -j,--jitter             (default 20  )        translation length
+   -t,--transImgInt        (default 20)          stepping of translation, number of images to create (ta/t)^2
+   --ta                    (default 40)          max translation length
    -r, --rotationImg       (default 2)           number of images to create by rotation
    --ra                    (default 0.1)         max angle of rotation
    -p,--pathToFolder       (default 'images')    path to the folder of images
@@ -57,33 +58,22 @@ function crop5_img(path_img, tmp_img, aug_path, jitter)
   -- assumes .jpg ending for now
   tmp_img = string.sub(tmp_img, 1, -5)
 
-  local sample = img[{{}, {1, w}, {1, h}}]
-  local img_path = aug_path .. "/" .. tmp_img .. "crop1.jpg"
-  image.save(img_path, sample)
+  local number_img = jitter/opt.transImgInt
 
-  for i=1, 2 do
-    for j=1, 2 do
-       local sample = img[{{}, {1+ (j-1) * jitter, (j-1) * jitter + w}, {1+ (i-1) * jitter, (i-1) * jitter + h}}]
-       local img_path = aug_path .. "/" .. tmp_img .. "crop" .. (j+(i-1)*2) .. ".jpg"
-       image.save(img_path, sample)
+  for i=1, number_img do
+    for j=1, number_img do
+       local sample = img[{{}, {1+ (j-1) * opt.transImgInt, (j-1) * opt.transImgInt + w}, 
+                               {1+ (i-1) * opt.transImgInt, (i-1) * opt.transImgInt + h}}]
+       local img_path = aug_path .. "/" .. tmp_img .. "crop" .. (j+(i-1)*number_img) .. ".jpg"
+       image.save(img_path, sample)      
+
 
        if opt.hflip == true then
-         hflip_img(aug_path, tmp_img .. "crop" .. (j+(i-1)*2) .. ".jpg", aug_path)
+         hflip_img(aug_path, tmp_img .. "crop" .. (j+(i-1)*number_img) .. ".jpg", aug_path)
        end
 
      end
    end
-
-  -- crop center 
-  jitter = jitter/2
-  local sample = img[{{}, {1 + jitter, jitter + w}, {1+ jitter, jitter + h}}]
-  local img_path = aug_path .. "/" .. tmp_img .. "crop" .. (5) .. ".jpg"
-  image.save(img_path, sample)
-
-  if opt.hflip == true then
-    hflip_img(aug_path, tmp_img .. "crop" .. (5) .. ".jpg", aug_path)
-  end
-
 
 end
 
@@ -96,8 +86,8 @@ for i=1, #image_names do
 
   local tmp_img = image_names[i]
   if (string.sub(tmp_img, 1, 1) ~= '.' and tmp_img ~= 'augmentations') then
-      if opt.jitter > 0 then
-         crop5_img(opt.pathToFolder, tmp_img, aug_path, opt.jitter)
+      if opt.ta > 0 then
+         crop5_img(opt.pathToFolder, tmp_img, aug_path, opt.ta)
       elseif opt.hflip == true then
          hflip_img(opt.pathToFolder, tmp_img, aug_path)
       end
