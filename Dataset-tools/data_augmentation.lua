@@ -8,7 +8,8 @@ require 'trepl'
 opt = lapp[[
    -h,--hflip              (default true)        horizontal flip
    -j,--jitter             (default 20  )        translation length
-   -r,--rotate             (default 0.1)         degree of rotation
+   -r, --rotationImg       (default 2)           number of images to create by rotation
+   --ra                    (default 0.1)         max angle of rotation
    -p,--pathToFolder       (default 'images')    path to the folder of images
 ]]
 
@@ -39,7 +40,7 @@ function rotate_img(path_img, tmp_img, aug_path, degree)
 
   -- assumes .jpg ending for now
   tmp_img = string.sub(tmp_img, 1, -5)
-  local img_path = aug_path .. "/" .. tmp_img .. "rotate.jpg"
+  local img_path = aug_path .. "/" .. tmp_img ..  "rotate" .. degree .. ".jpg"
   image.save(img_path, img_rotate)
 
 end
@@ -101,8 +102,11 @@ for i=1, #image_names do
          hflip_img(opt.pathToFolder, tmp_img, aug_path)
       end
 
-      if opt.rotate > 0 then
-         rotate_img(opt.pathToFolder, tmp_img, aug_path, opt.rotate)
+      if opt.ra > 0 then
+         local angle = opt.ra/opt.rotationImg
+         for i=1, opt.rotationImg do
+             rotate_img(opt.pathToFolder, tmp_img, aug_path, angle*i)
+          end
       end
   end
 end
