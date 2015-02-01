@@ -3,6 +3,7 @@
 A collection of snippets and libraries for Torch from Purdue [e-Lab](http://engineering.purdue.edu/elab/).
 
  - [Convert-MM](Convert-MM) to replace the ConvolutionMM with Convolution to support stride on CPU
+ - [Face-align-Cao](Face-align-Cao) to find facial landmarks and align the face using regression model
  - [Dataset-tools](Dataset-tools) to augment folder of images
  - [GPU-RAM](GPU-RAM) to monitor the GPU's memory usage
  - [GUI](GUI) provides some examples for playing with the *Qt Graphical User Interface*
