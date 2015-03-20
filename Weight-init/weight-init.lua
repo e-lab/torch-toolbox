@@ -59,7 +59,9 @@ local function w_init(net, arg)
       elseif m.__typename == 'nn.HorizontalConvolution' then
          m:reset(method(1*m.kH*m.kW, 1*m.kH*m.kW))
       elseif m.__typename == 'nn.Linear' then
-         m:reset(method(m.weight:size(1), m.weight:size(2)))
+         m:reset(method(m.weight:size(2), m.weight:size(1)))
+      elseif m.__typename == 'nn.TemporalConvolution' then
+         m:reset(method(m.weight:size(2), m.weight:size(1)))            
       end
 
       if m.bias then
