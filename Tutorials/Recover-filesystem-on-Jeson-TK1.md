@@ -80,7 +80,7 @@ sudo add-apt-repository universe
 Then,
 
 ```sh
-date --set="Fri Nov 21 01:23:45 EST 2014"
+sudo date --set="Fri Nov 21 01:23:45 EST 2014"
 sudo apt-get update
 sudo apt-get install -y git tmux vim
 ```
