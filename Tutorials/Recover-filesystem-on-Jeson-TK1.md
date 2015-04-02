@@ -15,10 +15,10 @@ mkdir -p /tmp/l4t
 cd /tmp/l4t
 
 # download driver
-wget http://developer.download.nvidia.com/mobile/tegra/l4t/r21.1.0/Tegra124_Linux_R21.1.0_armhf.tbz2
+wget http://developer.download.nvidia.com/mobile/tegra/l4t/r21.2.0/pm375_release_armhf/Tegra124_Linux_R21.2.0_armhf.tbz2
 
 # download Linux filesystem
-wget http://developer.download.nvidia.com/mobile/tegra/l4t/r21.1.0/Tegra_Linux_Sample-Root-Filesystem_R21.1.0_armhf.tbz2
+wget http://developer.download.nvidia.com/mobile/tegra/l4t/r21.2.0/pm375_release_armhf/Tegra_Linux_Sample-Root-Filesystem_R21.2.0_armhf.tbz2
 ```
 
 And extract tarballs,
