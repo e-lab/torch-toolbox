@@ -15,19 +15,19 @@ mkdir -p /tmp/l4t
 cd /tmp/l4t
 
 # download driver
-wget http://developer.download.nvidia.com/mobile/tegra/l4t/r21.2.0/pm375_release_armhf/Tegra124_Linux_R21.2.0_armhf.tbz2
+wget http://developer.download.nvidia.com/embedded/L4T/r21_Release_v3.0/Tegra124_Linux_R21.3.0_armhf.tbz2
 
 # download Linux filesystem
-wget http://developer.download.nvidia.com/mobile/tegra/l4t/r21.2.0/pm375_release_armhf/Tegra_Linux_Sample-Root-Filesystem_R21.2.0_armhf.tbz2
+wget http://developer.download.nvidia.com/embedded/L4T/r21_Release_v3.0/Tegra_Linux_Sample-Root-Filesystem_R21.3.0_armhf.tbz2
 ```
 
 And extract tarballs,
 
 ```sh
 cd /tmp/l4t
-sudo tar xpf Tegra124_Linux_R21.1.0_armhf.tbz2
+sudo tar xpf Tegra124_Linux_R21.3.0_armhf.tbz2
 cd Linux_for_Tegra/rootfs
-sudo tar xpf ../../Tegra_Linux_Sample-Root-Filesystem_R21.1.0_armhf.tbz2
+sudo tar xpf ../../Tegra_Linux_Sample-Root-Filesystem_R21.3.0_armhf.tbz2
 cd ..
 sudo ./apply_binaries.sh
 ```
