@@ -70,7 +70,19 @@ Detach your TK1 from host and reboot as a stand-alone system.
 
 ### Set up basic configurations on TK1 device
 
-Please set up basic configurations at your preference on TK1 device.
+You need to install CUDA toolkit for L4T in order to use CUDA compiler.
+
+```sh
+wget http://developer.download.nvidia.com/embedded/L4T/r21_Release_v3.0/cuda-repo-l4t-r21.3-6-5-prod_6.5-42_armhf.deb
+sudo dpkg -i cuda-repo-l4t-r21.3-6-5-prod_6.5-42_armhf.deb
+sudo apt-get update
+sudo apt-get install cuda-toolkit-6-5
+sudo usermod -a -G video ubuntu
+export PATH=/usr/local/cuda-6.5/bin:$PATH
+export LD_LIBRARY_PATH=/usr/local/cuda-6.5/lib:$LD_LIBRARY_PATH
+```
+
+Then, set up basic configurations at your preference on TK1 device.
 First, allow community-maintained open-source softwares.
 
 ```
