@@ -12,6 +12,11 @@ A collection of snippets and libraries for Torch from Purdue [e-Lab](http://engi
  - [Re-plotting](Re-plotting) to recover bad plot and merging splitted training
  - [Try-model](Try-model) to load a new model's architecture and visualise its memory consumption
  - [Tutorials](Tutorials) to help you set up Torch-related environment
+   - [Setup an Ubuntu GPU box](Tutorials/Setup-an-Ubuntu-GPU-box.md)
+   - [Recover a Jetson TK1 FS](Tutorials/Recover-filesystem-on-Jeson-TK1.md)
+   - [Update a new Jetson TK1](Tutorials/Update-new-Jetson-TK1.md)
+   - [Install CUDA on TK1](Tutorials/Install-CUDA-6.5-on-Jetson-TK1.md)
+   - [Install CUDNN on TK1](Tutorials/Install-CUDNN-on-Jetson-TK1.md)
  - [Video-decoder](Video-decoder) to receive and decode video from various sources
  - [Video-transmitter](Video-transmitter) to encode and transmit video on the fly
  - [Weight-init](Weight-init) to reset weight and bias to have desired statistics
