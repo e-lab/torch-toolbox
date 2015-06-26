@@ -19,7 +19,7 @@ cd /tmp/l4t/Linux_for_Tegra/bootloader
 sudo ./nvflash --read APP system.img --bl ardbeg/fastboot.bin --go
 ```
 
-After about 1,000 s (15 minutes) it will finish saying `file received successfully`.
+After about 1,000s (15 minutes) it will finish saying `file received successfully`.
 A file named `system.img` of approximately 8 GB will be created in the `bootloader` directory.
 
 ## Packaging
@@ -42,3 +42,5 @@ tar -xf my_backup.tar.gz
 cd Linux_for_Tegra
 sudo ./flash.sh -r -S 14580MiB jetson-tk1 mmcblk0p1
 ```
+
+This will take approximately 500s (8 mintes). Then the remote device will boot automatically, so grab a mouse, keyboard a screen and an HDMI cable, and have fun!
