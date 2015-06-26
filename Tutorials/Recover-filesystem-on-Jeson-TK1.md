@@ -40,11 +40,10 @@ Then, you will be able to see `Success!` message.
 Now bring your TK1 next to the host computer.
 Jetson TK1 board, micro-USB cable and power supply are needed.
 
-1. Turn on the TK1 board.
-2. Connect TK1 board to the host USB port (directly connected to host's mother board).
-3. Press and hold `FORCE RECOVERY` button, located on the corner of TK1.
-4. Press the `RESET` button, located next to the `FORCE RECOVERY` one.
-5. Wait a few seconds and release `FORCE RECOVERY` button.
+1. Connect TK1 board to the host USB port (directly connected to host's mother board).
+2. Press and hold `FORCE RECOVERY` button, located on the corner of TK1.
+3. Press the `RESET` button (if the board was already on), located next to the `FORCE RECOVERY` one, or the `POWER` button (if the board was off).
+4. Wait a few seconds and release `FORCE RECOVERY` button.
 
 On host, type the command to check if the board got into recovery mode.
 
