@@ -12,6 +12,7 @@ A collection of snippets and libraries for Torch from Purdue [e-Lab](http://engi
  - [Re-plotting](Re-plotting) to recover bad plot and merging splitted training
  - [Try-model](Try-model) to load a new model's architecture and visualise its memory consumption
  - [Tutorials](Tutorials) to help you set up Torch-related environment
+   - [Setup an Intel Compute Stick](Tutorials/Setup-an-Intel-Compute-Stick.md)
    - [Setup an Ubuntu GPU box](Tutorials/Setup-an-Ubuntu-GPU-box.md)
    - [Recover a Jetson TK1 FS](Tutorials/Recover-filesystem-on-Jeson-TK1.md)
    - [Update a new Jetson TK1](Tutorials/Update-new-Jetson-TK1.md)
