@@ -66,7 +66,7 @@ chmod +x cuda*
 sudo ./cuda*
 ```
 
-**Do not** install the *OpenGL* libraries if you are planning to use your integrated graphic card for displaying purpose.
+**DO NOT** install the *OpenGL* libraries if you are planning to use your integrated graphic card for displaying purpose.
 Accept everything else and press enter for default locations.
 Add the following lines to your `~/.bashrc`.
 
@@ -84,6 +84,16 @@ You can try to run one of the *Samples* to test if everything went well. Install
 
 Check if your drivers are up to date (compare what you get with `nvidia-smi` with what you can find on [*nVIDIA* webpage](http://www.nvidia.com/Download/index.aspx)).
 If they are not, update your system like you just did for installing the *CUDA Toolkit* but with the driver `run` package instead.
+
+As mentioned before, if you are planning to use your integrated graphic card for displaying purpose, **DO NOT** install the *OpenGL* libraries nor update your `/etc/X11/xorg.conf`! In order to doing so you can digit (with the correct version numbering):
+
+```bash
+sudo service lightdm stop
+cd Downloads
+chmod +x NVIDIA*
+sudo ./NVIDIA-Linux-x86_64-352.41.run  --no-opengl-files
+sudo reboot
+```
 
 ## Edit Terminal's settings
 
