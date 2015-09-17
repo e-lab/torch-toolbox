@@ -54,14 +54,14 @@ local loss = nn.ClassNLLCriterion()
 -- generate adversarial examples
 local img_adv = require('adversarial-fast')(model, loss, img:clone(), label_nb, std, intensity)
 
-
+model.modules[#model.modules] = nn.SoftMax()
 -- check prediction results
 local pred = model:forward(img)
-local _, idx = pred:max(pred:dim())
-print('==> original:', label[ idx[1] ])
+local val, idx = pred:max(pred:dim())
+print('==> original:', label[ idx[1] ], 'confidence:', val[1])
 
 local pred = model:forward(img_adv)
-local _, idx = pred:max(pred:dim())
-print('==> adversarial:', label[ idx[1] ])
+local val, idx = pred:max(pred:dim())
+print('==> adversarial:', label[ idx[1] ], 'confidence:', val[1])
 
-print('==> diff [min/max]:', torch.add(img, -img_adv):abs():mean())
+print('==> mean absolute diff between the original and adversarial images[min/max]:', torch.add(img, -img_adv):abs():mean())
