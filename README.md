@@ -12,6 +12,7 @@ A collection of snippets and libraries for Torch from Purdue [e-Lab](http://engi
  - [GUI](GUI) provides some examples for playing with the *Qt Graphical User Interface*
  - [Net-toolkit](Net-toolkit/README.md) is a Lua package for smart/light network saving
  - [Re-plotting](Re-plotting) to recover bad plot and merging splitted training
+ - [Sanitize](Sanitize) to free temporary buffers in order to reduce a model size before saving on disk
  - [Try-model](Try-model) to load a new model's architecture and visualise its memory consumption
  - [Tutorials](Tutorials) to help you set up Torch-related environment
    - [Setup an Intel Compute Stick](Tutorials/Setup-an-Intel-Compute-Stick.md)
