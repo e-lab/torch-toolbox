@@ -14,10 +14,9 @@ and download other files.
 ```bash
 git clone https://github.com/jhjin/overfeat-torch
 cd overfeat-torch
-echo "torch.save('model.net', net)" >> run.lua
 . install.sh
 th run.lua
-mv model.net bee.jpg overfeat_label.lua ..
+mv model.t7 bee.jpg overfeat_label.lua ..
 cd ..
 ```
 
