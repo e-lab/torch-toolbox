@@ -73,7 +73,6 @@ local function sanitize(model)
       for name,field in pairs(val) do
 
          -- remove ffi obj
-         print(name)
          if torch.type(field) == 'cdata' then
             val[name] = nil
 
