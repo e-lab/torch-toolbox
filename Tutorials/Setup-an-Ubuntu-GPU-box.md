@@ -5,8 +5,9 @@ This is a quick quide (checklist) of things you need to do to get a `Ubuntu GPU 
  - [Make a USB bootable drive](#make-a-usb-bootable-drive)
  - Main drive **must** be `dev/sda`, *otherwise it fails*
  - **NO** *quickBoot / FastBoot* option in the *BIOS*, *otherwise you cannot reboot*
- - Update *Ubuntu*'s packages, *otherwise you use old stuff*
- - Install `git`, `vim`, `tmux`, `htop` and `tree`, *otherwise nothing works*
+ - [Update *Ubuntu*'s packages, *otherwise you use old stuff*](#update-stuff)
+ - [Install `git`, `vim`, `tmux`, `htop` and `tree`, *otherwise nothing works*](#install-essentials)
+ - [Add *exFAT* file system read/write support](#add-exfat-fs-support)
  - [Update terminal's colours, configurations and substitute `<Caps lock>` with additional `<Ctrl>`](#better-configuration), *otherwise it looks and feels like s*\*\**t*
  - [Assign *static IP*](#assign-static-ip)
  - [Install a `ssh` server](#install-a-ssh-server)
@@ -37,6 +38,26 @@ diskutil list
 
 ```bash
 dd if=./ubuntu-image.dmg of=/dev/diskNB bs=1m
+```
+
+## Update stuff
+
+```bash
+sudo apt-get update
+sudo apt-get dist-upgrade -y
+sudo apt-get autoremove -y
+```
+
+## Install essentials
+
+```bash
+sudo apt-get install -y git vim tmux htop tree
+```
+
+## Add *exFAT* FS support
+
+```bash
+sudo apt-get install -y exfat-utils exfat-fuse
 ```
 
 ## Better configuration
