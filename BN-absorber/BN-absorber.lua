@@ -1,9 +1,9 @@
 require('nn')
 
 
-local function absorb_bn(w, b, mean, std, affine, gamma, beta)
-   w:cmul(std:view(w:size(1),1):repeatTensor(1,w:size(2)))
-   b:add(-mean):cmul(std)
+local function absorb_bn(w, b, mean, invstd, affine, gamma, beta)
+   w:cmul(invstd:view(w:size(1),1):repeatTensor(1,w:size(2)))
+   b:add(-mean):cmul(invstd)
 
    if affine then
       w:cmul(gamma:view(w:size(1),1):repeatTensor(1,w:size(2)))
@@ -27,11 +27,9 @@ local function BN_absorber(x)
          BN_absorber(x.modules[i])
       else
          -- check BN
-         if x.modules[i].__typename == 'nn.SpatialBatchNormalization' or
-            x.modules[i].__typename == 'nn.BatchNormalization' then
+         if x.modules[i].__typename == 'nn.SpatialBatchNormalization' then
             if x.modules[i-1] and
-              (x.modules[i-1].__typename == 'nn.Linear' or
-               x.modules[i-1].__typename == 'nn.SpatialConvolution' or
+              (x.modules[i-1].__typename == 'nn.SpatialConvolution' or
                x.modules[i-1].__typename == 'nn.SpatialConvolutionMM') then
                -- force weight to be in 2-dim
                local weight = x.modules[i-1].weight
@@ -39,6 +37,23 @@ local function BN_absorber(x)
 
                -- remove BN
                absorb_bn(weight,
+                         x.modules[i-1].bias,
+                         x.modules[i].running_mean,
+                         x.modules[i].running_var:clone():sqrt():add(x.modules[i].eps):pow(-1),
+                         x.modules[i].affine,
+                         x.modules[i].weight,
+                         x.modules[i].bias)
+               x:remove(i)
+               i = i - 1
+            else
+               assert(false, 'Convolution module must exist right before batch normalization layer')
+            end
+         elseif x.modules[i].__typename == 'nn.BatchNormalization' then
+            if x.modules[i-1] and
+              (x.modules[i-1].__typename == 'nn.Linear') then
+
+               -- remove BN
+               absorb_bn(x.modules[i-1].weight,
                          x.modules[i-1].bias,
                          x.modules[i].running_mean,
                          x.modules[i].running_std,
