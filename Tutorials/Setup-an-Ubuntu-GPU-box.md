@@ -97,7 +97,7 @@ PATH=$PATH':/usr/local/cuda/bin'
 LD_LIBRARY_PATH=$LD_LIBRARY_PATH':/usr/local/cuda/lib64'
 ```
 
-You can try to run one of the *Samples* to test if everything went well. Install `g++` first (`sudo apt-get install -y g++`) and cd into `~/NVIDIA_CUDA*Samples/1_Utilities/deviceQuery`, `make` and then `./deviceQuery`.
+You can try to run one of the *Samples* to test if everything went well. Before that, get the metapackage `build-essential` which will install `gcc` compiler and other related packages (`sudo apt-get install -y build-essential`). cd into `~/NVIDIA_CUDA*Samples/1_Utilities/deviceQuery`, `make` and then `./deviceQuery`.
 
 `sudo reboot` your system.
 
