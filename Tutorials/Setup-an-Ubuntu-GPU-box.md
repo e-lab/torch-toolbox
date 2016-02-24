@@ -40,7 +40,9 @@ diskutil list
 dd if=./ubuntu-image.dmg of=/dev/diskNB bs=1m
 ```
 
-## Update stuff
+## After Installation
+
+### Update stuff
 
 ```bash
 sudo apt-get update
@@ -48,35 +50,35 @@ sudo apt-get dist-upgrade -y
 sudo apt-get autoremove -y
 ```
 
-## Install essentials
+### Install essentials
 
 ```bash
 sudo apt-get install -y git vim tmux htop tree
 ```
 
-## Add *exFAT* FS support
+### Add *exFAT* FS support
 
 ```bash
 sudo apt-get install -y exfat-utils exfat-fuse
 ```
 
-## Better configuration
+### Better configuration
 
 Go [here](https://github.com/Atcold/Unix-dot-files), and go through it.
 
-## Assign **static IP**
+### Assign **static IP**
 
 `Network Connection` -> `Edit...` -> `IPv4 Settings` -> `Method:` -> `Manual` -> `Add`.
 To get the *IP address* of your *name* you can `ping` it in the terminal (`ping <myStaticName.ecn.purdue.edu>`).
 Configurations for *DNS servers*, *gateway* and *sub-net mask* can be found on the corresponding [ECN webpage](https://engineering.purdue.edu/ECN/Support/KB/Docs/IPSettings).
 
-## Install a `ssh` server
+### Install a `ssh` server
 
 ```bash
 sudo apt-get install -y openssh-server
 ```
 
-## Install *CUDA Toolkit*
+### Install *CUDA Toolkit*
 
 Let's download the latest *CUDA Toolkit* available from [*nVIDIA* website](https://developer.nvidia.com/cuda-downloads) for your *Ubuntu* version. `ssh` remotely from another machine (or use a virtual console with `<Ctrl>`-`<Alt>`-`F1` to `F6`).
 
@@ -101,7 +103,7 @@ You can try to run one of the *Samples* to test if everything went well. Before 
 
 `sudo reboot` your system.
 
-## Update graphics driver
+### Update graphics driver
 
 Check if your drivers are up to date (compare what you get with `nvidia-smi` with what you can find on [*nVIDIA* webpage](http://www.nvidia.com/Download/index.aspx)).
 If they are not, update your system like you just did for installing the *CUDA Toolkit* but with the driver `run` package instead.
@@ -116,7 +118,7 @@ sudo ./NVIDIA-Linux-x86_64-352.41.run  --no-opengl-files
 sudo reboot
 ```
 
-## Edit Terminal's settings
+### Edit Terminal's settings
 
 `Edit` -> `Profile Preferences` -> `Scrolling` -> check `Unlimited`.
 ## Install Torch7
@@ -125,7 +127,7 @@ sudo reboot
 curl -s https://raw.githubusercontent.com/torch/ezinstall/master/install-all | bash
 ```
 
-## Change ownership of `usr/local`
+### Change ownership of `usr/local`
 
 Since `/usr/local` is belonging to the (administrator) user, we enforce this with
 
