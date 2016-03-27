@@ -124,7 +124,10 @@ sudo reboot
 ## Install Torch7
 
 ```bash
-curl -s https://raw.githubusercontent.com/torch/ezinstall/master/install-all | bash
+# in a terminal, run the commands
+git clone https://github.com/torch/distro.git ~/torch --recursive
+cd ~/torch; bash install-deps;
+./install.sh
 ```
 
 ### Change ownership of `usr/local`
