@@ -1,10 +1,11 @@
 UNAME_S := $(shell uname -s)
 UNAME_P := $(shell uname -p)
 
-INCLUDE = -I. -I/usr/local/include
+TORCH = $(HOME)/torch/install
+INCLUDE = -I. -I$(TORCH)/include
 LDFLAGS := -lavutil -lavformat -lavcodec
-LIBOPTS = -shared -L/usr/local/lib/lua/5.1 -L/usr/local/lib/
-CFLAGS = -O3 -fopenmp -c -fpic -Wall
+LIBOPTS = -shared -L$(TORCH)/lib/lua/5.1 -L$(TORCH)/lib
+CFLAGS = -O3 -c -fpic -Wall
 CC = gcc
 
 ifneq ($(filter arm%,$(UNAME_P)),)

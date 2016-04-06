@@ -369,10 +369,10 @@ static int video_decoder_init(lua_State * L)
 	}
 
 	/* allocate a raw AVFrame structure (yuv420p) */
-	pFrame_yuv = avcodec_alloc_frame();
+	pFrame_yuv = av_frame_alloc();
 
 	/* allocate an AVFrame structure (No DMA memory) */
-	pFrame_intm = avcodec_alloc_frame();
+	pFrame_intm = av_frame_alloc();
 	pFrame_intm->height = pCodecCtx->height;
 	pFrame_intm->width = pCodecCtx->width;
 	pFrame_intm->data[0] = av_malloc(pCodecCtx->width * pCodecCtx->height);
@@ -456,7 +456,7 @@ static int video_decoder_rgb(lua_State * L)
 			lua_pushboolean(L, 0);
 			return 1;
 		}
-		if(pCodecCtx->pix_fmt == PIX_FMT_YUV422P || pCodecCtx->pix_fmt == PIX_FMT_YUVJ422P)
+		if(pCodecCtx->pix_fmt == AV_PIX_FMT_YUV422P || pCodecCtx->pix_fmt == AV_PIX_FMT_YUVJ422P)
 			video_decoder_yuv422p_rgbp(pFrame_yuv, pFrame_intm);
 		else video_decoder_yuv420p_rgbp(pFrame_yuv, pFrame_intm);
 		pthread_mutex_unlock(&readmutex);
@@ -482,7 +482,7 @@ static int video_decoder_rgb(lua_State * L)
 			if (frame_decoded) {
 
 				/* convert YUV420p to planar RGB */
-				if(pCodecCtx->pix_fmt == PIX_FMT_YUV422P || pCodecCtx->pix_fmt == PIX_FMT_YUVJ422P)
+				if(pCodecCtx->pix_fmt == AV_PIX_FMT_YUV422P || pCodecCtx->pix_fmt == AV_PIX_FMT_YUVJ422P)
 					video_decoder_yuv422p_rgbp(pFrame_yuv, pFrame_intm);
 				else video_decoder_yuv420p_rgbp(pFrame_yuv, pFrame_intm);
 
