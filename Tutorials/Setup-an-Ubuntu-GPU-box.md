@@ -133,7 +133,18 @@ sudo reboot
 ### Edit Terminal's settings
 
 `Edit` -> `Profile Preferences` -> `Scrolling` -> check `Unlimited`.
-## Install Torch7
+
+### Install OpenBlas
+
+```
+git clone https://github.com/xianyi/OpenBLAS.git
+cd OpenBLAS
+make NO_AFFINITY=1 USE_OPENMP=1
+sudo make install
+PREFIX=${PREFIX-/usr/local}
+export CMAKE_LIBRARY_PATH=/opt/OpenBLAS/include:/opt/OpenBLAS/lib:$CMAKE_LIBRARY_PATH
+```
+### Install Torch7
 
 ```bash
 # in a terminal, run the commands
