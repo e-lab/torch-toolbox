@@ -17,7 +17,7 @@ This is a quick quide (checklist) of things you need to do to get a `Ubuntu GPU 
  - [Edit Terminal's settings](#edit-terminals-settings)
  - [Install Torch7](#install-torch7)
  - [Change ownership of `usr/local`](#change-ownership-of-usrlocal)
-
+ - [Automatic HDD sense](#automatic HDD sense)
 ## Make a USB bootable drive
 
 This instructions apply to the OSX platform.
@@ -161,3 +161,16 @@ Since `/usr/local` is belonging to the (administrator) user, we enforce this wit
 sudo chown -R me:me /usr/local
 sudo rm -rf ~/.cache/luarocks
 ```
+###automatic HDD sense
+
+Go to Disks in gui
+
+Click target disk --> More actions --> Edit Mount Options 
+
+DO 
+
+1. Automatic Mount Options set OFF 
+
+2. Change (nosuid,nodev,nofail,x-gvfs-show) to (nosuid,nodev,nofail,comment=x-gvfs-show)
+
+3. Mout Pint : /media/name of Disk
