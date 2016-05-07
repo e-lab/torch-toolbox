@@ -52,6 +52,8 @@ local function w_init(net, arg)
          m:reset(method(m.nInputPlane*m.kH*m.kW, m.nOutputPlane*m.kH*m.kW))
       elseif m.__typename == 'nn.SpatialConvolutionMM' then
          m:reset(method(m.nInputPlane*m.kH*m.kW, m.nOutputPlane*m.kH*m.kW))
+      elseif m.__typename == 'cudnn.SpatialConvolution' then
+         m:reset(method(m.nInputPlane*m.kH*m.kW, m.nOutputPlane*m.kH*m.kW))
       elseif m.__typename == 'nn.LateralConvolution' then
          m:reset(method(m.nInputPlane*1*1, m.nOutputPlane*1*1))
       elseif m.__typename == 'nn.VerticalConvolution' then
