@@ -115,6 +115,8 @@ You can try to run one of the *Samples* to test if everything went well. Before 
 
 `sudo reboot` your system.
 
+If you made any mistake and you want to uninstall CUDA Toolkit, then run the uninstall script in `/usr/local/cuda-7.5/bin`. To uninstall NVIDIA driver, run `NVIDIA-Linux-x86-310.19.run --uninstall`.
+
 ### Update graphics driver
 
 Check if your drivers are up to date (compare what you get with `nvidia-smi` with what you can find on [*nVIDIA* webpage](http://www.nvidia.com/Download/index.aspx)).
