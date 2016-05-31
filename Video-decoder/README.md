@@ -266,25 +266,6 @@ Returns:
 
 - error code (0=ok, -6=SSL/TLS support not compiled in, -7=certificate file not found)
 
-## postfile
-
-Post a file to a server
-
-Parameters:
-
-- url where to post
-- path to the file to post
-- filename as passed to the server
-- username
-- password (username will be sent in the HTTP Basic authorization field if password is missing)
-- device
-
-Returns:
-
-- error code (if positive, it's a HTTP result code, if negative it'a library return code, 0=success)
-- error code in string format, if negative
-- contents returned by the server or everything returned by the server if error code != 0
-
 ## loglevel
 
 Set the logging level of the library
