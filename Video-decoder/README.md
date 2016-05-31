@@ -254,18 +254,6 @@ Returns:
 
 - status (1=ok, 0=failed)
 
-## https_init
-
-Initialize the SSL/TLS library
-
-Parameters:
-
-- certificate file used to authenticate the server
-	
-Returns:
-
-- error code (0=ok, -6=SSL/TLS support not compiled in, -7=certificate file not found)
-
 ## loglevel
 
 Set the logging level of the library
