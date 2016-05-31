@@ -2737,7 +2737,7 @@ static int videocap_init(lua_State *L)
 		vcodec_extradata = malloc(vcodec_extradata_size);
 		memcpy(vcodec_extradata, extradata, vcodec_extradata_size);
 	}
-   vcap_frame = malloc(w * h * 2);
+	vcap_frame = malloc(w * h * 2);
 	frame_width = w;
 	frame_height = h;
 	stream_idx = 0; // Required by write_packet

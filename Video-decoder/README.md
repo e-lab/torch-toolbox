@@ -312,20 +312,6 @@ Example:
 	
 	print(diffimages(image.lena(), image.lena(), 0.01, 0.001))
 
-## startpostingdir
-
-Starts a thread that posts files in a directory
-
-Parameters:
-
-- directory to monitor
-- url where to post files
-- authorization string
-- device
-
-Files ending with .tmp are initially deleted and ignored afterwards.
-This function does not return anything.
-
 ## encoderopen
 
 Opens the libav video encoder
