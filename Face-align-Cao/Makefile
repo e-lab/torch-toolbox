@@ -1,6 +1,7 @@
 UNAME_S := $(shell uname -s)
 
-CXXFLAGS = -O3 -c -fpic -Wall -I/usr/include/opencv -I/usr/local/include -std=c++11
+TORCH = $(HOME)/torch/install
+CXXFLAGS = -O3 -c -fpic -Wall -I/usr/include/opencv -I/usr/local/include -std=c++11 -I$(TORCH)/include
 LDFLAGS := -shared
 FILES = FernCascade.o Fern.o ShapeRegressor.o Utils.o face_align.o
 

@@ -28,7 +28,7 @@ static bool facealign_file_exists(const char *filename)
 static const char* facealign_check_binary_model(const char *path)
 {
    //const char *path = lua_tostring(L, 1);
-   char *ext = strrchr(path, '.');
+   const char *ext = strrchr(path, '.');
 
    // input has no extension
    if (ext == NULL) {
