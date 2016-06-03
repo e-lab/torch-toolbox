@@ -1185,7 +1185,7 @@ int ToTensor(unsigned char *dst_byte, float *dst_float, long *stride, long *size
 
 		if(pCodecCtx->pix_fmt == PIX_FMT_YUV422P || pCodecCtx->pix_fmt == PIX_FMT_YUVJ422P)
 			video_decoder_yuv422p_rgbp(pFrame_yuv, pFrame_intm);
-		else if(pCodecCtx->pix_fmt == PIX_FMT_YUV420P)
+		else if(pCodecCtx->pix_fmt == PIX_FMT_YUV420P || pCodecCtx->pix_fmt == PIX_FMT_YUVJ420P)
 			video_decoder_yuv420p_rgbp(pFrame_yuv, pFrame_intm);
 		else if(pCodecCtx->pix_fmt == PIX_FMT_RGB24)
 			video_decoder_rgb_ByteTensor(pFrame_yuv, dst_byte, stride);
@@ -1200,7 +1200,7 @@ int ToTensor(unsigned char *dst_byte, float *dst_float, long *stride, long *size
 	} else {
 		if(pCodecCtx->pix_fmt == PIX_FMT_YUV422P || pCodecCtx->pix_fmt == PIX_FMT_YUVJ422P)
 			yuv422p_floatrgbp(pFrame_yuv, dst_float, stride[0], stride[1], pCodecCtx->width, pCodecCtx->height);
-		else if(pCodecCtx->pix_fmt == PIX_FMT_YUV420P)
+		else if(pCodecCtx->pix_fmt == PIX_FMT_YUV420P || pCodecCtx->pix_fmt == PIX_FMT_YUVJ420P)
 			yuv420p_floatrgbp(pFrame_yuv, dst_float, stride[0], stride[1], pCodecCtx->width, pCodecCtx->height);
 		else if(pCodecCtx->pix_fmt == PIX_FMT_RGB24)
 			video_decoder_rgb_FloatTensor(pFrame_yuv, dst_float, stride);
@@ -1323,7 +1323,7 @@ static int video_decoder_rgb(lua_State * L)
 		}
 		// Convert from YUV to RGB
 		if(ToTensor(dst_byte, dst_float, stride, size))
-			luaL_error(L, "<video_decoder>: unsupported codec pixel format");
+			luaL_error(L, "<video_decoder>: unsupported codec pixel format %d", pCodecCtx->pix_fmt);
 		pthread_mutex_unlock(&readmutex);
 
 		lua_pushboolean(L, 1);
@@ -1365,7 +1365,7 @@ static int video_decoder_rgb(lua_State * L)
 			if (frame_decoded) {
 
 				if(ToTensor(dst_byte, dst_float, stride, size))
-					luaL_error(L, "<video_decoder>: unsupported codec pixel format");
+					luaL_error(L, "<video_decoder>: unsupported codec pixel format %d", pCodecCtx->pix_fmt);
 				if(!stream_ended)
 					av_free_packet(&packet);
 				lua_pushboolean(L, 1);
