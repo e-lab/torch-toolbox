@@ -28,6 +28,7 @@ endif
 
 ifeq ($(UNAME_S),Darwin)
 	LDFLAGS += -lTH -lluajit -lluaT
+	CFLAGS += -DDARWIN
 endif
 
 ifeq ($(UNAME_S),Linux)

@@ -1183,26 +1183,26 @@ int ToTensor(unsigned char *dst_byte, float *dst_float, long *stride, long *size
 	{
 		int c;
 
-		if(pCodecCtx->pix_fmt == PIX_FMT_YUV422P || pCodecCtx->pix_fmt == PIX_FMT_YUVJ422P)
+		if(pCodecCtx->pix_fmt == AV_PIX_FMT_YUV422P || pCodecCtx->pix_fmt == AV_PIX_FMT_YUVJ422P)
 			video_decoder_yuv422p_rgbp(pFrame_yuv, pFrame_intm);
-		else if(pCodecCtx->pix_fmt == PIX_FMT_YUV420P || pCodecCtx->pix_fmt == PIX_FMT_YUVJ420P)
+		else if(pCodecCtx->pix_fmt == AV_PIX_FMT_YUV420P || pCodecCtx->pix_fmt == AV_PIX_FMT_YUVJ420P)
 			video_decoder_yuv420p_rgbp(pFrame_yuv, pFrame_intm);
-		else if(pCodecCtx->pix_fmt == PIX_FMT_RGB24)
+		else if(pCodecCtx->pix_fmt == AV_PIX_FMT_RGB24)
 			video_decoder_rgb_ByteTensor(pFrame_yuv, dst_byte, stride);
 		else return -1;
 
 		/* copy each channel from av_malloc to DMA_malloc */
-		if(pCodecCtx->pix_fmt != PIX_FMT_RGB24)
+		if(pCodecCtx->pix_fmt != AV_PIX_FMT_RGB24)
 			for (c = 0; c < 3; c++)
 				memcpy(dst_byte + c * stride[0],
 					   pFrame_intm->data[c],
 					   size[1] * size[2]);
 	} else {
-		if(pCodecCtx->pix_fmt == PIX_FMT_YUV422P || pCodecCtx->pix_fmt == PIX_FMT_YUVJ422P)
+		if(pCodecCtx->pix_fmt == AV_PIX_FMT_YUV422P || pCodecCtx->pix_fmt == AV_PIX_FMT_YUVJ422P)
 			yuv422p_floatrgbp(pFrame_yuv, dst_float, stride[0], stride[1], pCodecCtx->width, pCodecCtx->height);
-		else if(pCodecCtx->pix_fmt == PIX_FMT_YUV420P || pCodecCtx->pix_fmt == PIX_FMT_YUVJ420P)
+		else if(pCodecCtx->pix_fmt == AV_PIX_FMT_YUV420P || pCodecCtx->pix_fmt == AV_PIX_FMT_YUVJ420P)
 			yuv420p_floatrgbp(pFrame_yuv, dst_float, stride[0], stride[1], pCodecCtx->width, pCodecCtx->height);
-		else if(pCodecCtx->pix_fmt == PIX_FMT_RGB24)
+		else if(pCodecCtx->pix_fmt == AV_PIX_FMT_RGB24)
 			video_decoder_rgb_FloatTensor(pFrame_yuv, dst_float, stride);
 		else return -1;
 	}
