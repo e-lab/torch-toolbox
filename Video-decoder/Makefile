@@ -27,7 +27,7 @@ ifneq ($(filter arm%,$(UNAME_P)),)
 endif
 
 ifeq ($(UNAME_S),Darwin)
-	LDFLAGS += -lTH -lluajit -lluaT
+	LDFLAGS += -lTH -lluajit -lluaT /usr/local/lib/libjpeg.dylib /usr/local/lib/libpng.dylib
 	CFLAGS += -DDARWIN
 endif
 
