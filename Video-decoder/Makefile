@@ -45,10 +45,10 @@ libvideo_decoder.so : $(VIDEODEC_FILES)
 	$(CC) $(VIDEODEC_FILES) $(LIBOPTS) -o $@ $(LDFLAGS)
 
 install : libvideo_decoder.so
-	sudo cp libvideo_decoder.so /usr/local/lib/lua/5.1/
+	cp libvideo_decoder.so $(TORCH)/lib/lua/5.1/
 
 uninstall :
-	sudo rm /usr/local/lib/lua/5.1/libvideo_decoder.so
+	rm $(TORCH)/lib/lua/5.1/libvideo_decoder.so
 
 .PHONY : clean
 clean :
