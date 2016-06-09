@@ -131,7 +131,8 @@ chmod +x NVIDIA*
 sudo ./NVIDIA-Linux-x86_64-352.41.run --no-opengl-files
 sudo reboot
 ```
-# install nccl library
+### Install nccl library
+
 ```bash
 git clone https://github.com/NVIDIA/nccl
 cd nccl
