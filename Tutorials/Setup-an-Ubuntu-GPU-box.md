@@ -157,6 +157,14 @@ export CMAKE_LIBRARY_PATH=/opt/OpenBLAS/include:/opt/OpenBLAS/lib:$CMAKE_LIBRARY
 ```
 ### Install Torch7
 
+Torch7 installation instructions have been taken from ['here'](https://github.com/torch/distro).
+
+To install dependencies:
+```bash
+curl -s https://raw.githubusercontent.com/torch/distro/master/install-deps | bash
+```
+Below instructions will clone the Torch repo and install all the basic packages such as `nn`, `cutorch`, `cunn`, `cudnn` (if you have CUDA).
+
 ```bash
 # in a terminal, run the commands
 git clone https://github.com/torch/distro.git ~/torch --recursive
