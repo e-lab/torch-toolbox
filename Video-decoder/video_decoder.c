@@ -31,6 +31,13 @@
 #include "videocodec.h"
 #endif
 
+#ifdef NEWFFMPEG
+#define avcodec_alloc_frame() av_frame_alloc()
+#define avcodec_free_frame(a) av_frame_free(a)
+#define avcodec_get_frame_defaults(a) av_frame_unref(a)
+#define av_free_packet(a) av_packet_unref(a)
+#endif
+
 #define BYTE2FLOAT 0.003921568f // 1/255
 
 // Defined in mpjpeg.c
@@ -1723,11 +1730,11 @@ static void log_packet(const AVFormatContext *fmt_ctx, const AVPacket *pkt, cons
 	if(loglevel < 7)
 		return;
 	if(!fmt_ctx)
-		fprintf(stderr, "%s stream=%d dur=%d dts=%ld pts=%ld len=%d %s\n", tag, pkt->stream_index, pkt->duration,
+		fprintf(stderr, "%s stream=%d dur=%d dts=%ld pts=%ld len=%d %s\n", tag, pkt->stream_index, (int)pkt->duration,
 			(long)pkt->dts,
 			(long)pkt->pts,
 			pkt->size, pkt->flags & AV_PKT_FLAG_KEY ? "KEY" : "");
-	else fprintf(stderr, "%s stream=%d dur=%d dts=%f pts=%f len=%d %s\n", tag, pkt->stream_index, pkt->duration,
+	else fprintf(stderr, "%s stream=%d dur=%d dts=%f pts=%f len=%d %s\n", tag, pkt->stream_index, (int)pkt->duration,
 			(double)pkt->dts * fmt_ctx->streams[pkt->stream_index]->time_base.num / fmt_ctx->streams[pkt->stream_index]->time_base.den,
 			(double)pkt->pts * fmt_ctx->streams[pkt->stream_index]->time_base.num / fmt_ctx->streams[pkt->stream_index]->time_base.den,
 			pkt->size, pkt->flags & AV_PKT_FLAG_KEY ? "KEY" : "");

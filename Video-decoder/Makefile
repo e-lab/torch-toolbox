@@ -1,3 +1,5 @@
+NEWFFMPEG = 0
+
 UNAME_S := $(shell uname -s)
 UNAME_P := $(shell uname -p)
 
@@ -10,30 +12,27 @@ VIDEODEC_FILES = video_decoder.o mpjpeg.o
 CC = gcc
 
 #Lua has its own libjpeg.so which confuses the linker if we simply use -ljpeg
-ifneq ($(filter aarc% arm%,$(UNAME_P)),)
+ifeq ($(UNAME_S),Darwin)
+	LDFLAGS += -lTH -lluajit -lluaT /usr/local/lib/libjpeg.dylib
+	CFLAGS += -DDARWIN
+else ifneq ($(filter aarc% arm%,$(UNAME_P)),)
 	LDFLAGS += /usr/lib/arm-linux-gnueabihf/libjpeg.so
+	CFLAGS += -mfpu=neon
 else ifneq ($(filter x86_64,$(UNAME_P)),)
-	ifneq ($(UNAME_S),Darwin)
-		LDFLAGS += /usr/lib/x86_64-linux-gnu/libjpeg.so
-	endif
+	LDFLAGS += /usr/lib/x86_64-linux-gnu/libjpeg.so
 else ifneq ($(filter i686,$(UNAME_P)),)
 	LDFLAGS += /usr/lib/i386-linux-gnu/libjpeg.so
 else
-	LDFLAGS += -ljpeg -lpng
-endif
-
-ifneq ($(filter arm%,$(UNAME_P)),)
-	CFLAGS += -mfpu=neon
-endif
-
-ifeq ($(UNAME_S),Darwin)
-	LDFLAGS += -lTH -lluajit -lluaT /usr/local/lib/libjpeg.dylib /usr/local/lib/libpng.dylib
-	CFLAGS += -DDARWIN
+	LDFLAGS += -ljpeg
 endif
 
 ifeq ($(UNAME_S),Linux)
 	VIDEODEC_FILES += videocap.o videocodec.o
 	CFLAGS += -DDOVIDEOCAP
+endif
+
+ifeq ($(NEWFFMPEG),1)
+	CFLAGS += -DNEWFFMPEG
 endif
 
 .PHONY : all

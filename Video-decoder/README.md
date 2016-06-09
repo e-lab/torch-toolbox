@@ -27,6 +27,13 @@ To build library,
 make
 ```
 
+or
+
+```sh
+make NEWFFMPEG=1
+```
+
+if you have a recent version of ffmpeg.
 
 ### Test
 
