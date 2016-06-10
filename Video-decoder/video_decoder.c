@@ -2610,6 +2610,7 @@ static int lua_diffimages(lua_State * L)
 	int c, x, y;
 	int dim = 0;
 	long *stride = NULL;
+	long *stride2 = NULL;
 	long *size = NULL;
 	unsigned char *img1_byte = NULL, *img2_byte = NULL;
 	float *img1_float = NULL, *img2_float = NULL;
@@ -2631,6 +2632,7 @@ static int lua_diffimages(lua_State * L)
 		img2_byte = THByteTensor_data(img2);
 		dim = img1->nDimension;
 		stride = &img1->stride[0];
+		stride2 = &img2->stride[0];
 		size = &img1->size[0];
 		if(dim != 3)
 			luaL_error(L, "<video_decoder>: only 3D tensors are supported as input");
@@ -2645,6 +2647,7 @@ static int lua_diffimages(lua_State * L)
 		img2_float = THFloatTensor_data(img2);
 		dim = img1->nDimension;
 		stride = &img1->stride[0];
+		stride2 = &img2->stride[0];
 		size = &img1->size[0];
 		if(dim != 3)
 			luaL_error(L, "<video_decoder>: only 3D tensors are supported as input");
@@ -2655,13 +2658,14 @@ static int lua_diffimages(lua_State * L)
 	}
 
 	area *= size[0] * size[1] * size[2];
+
 	if(img1_float)
 	{
 		for(c = 0; c < size[0]; c++)
 			for(y = 0; y < size[1]; y++)
 				for(x = 0; x < size[2]; x++)
 					if(fabs(img1_float[stride[0] * c + stride[1] * y + stride[2] * x] -
-						img2_float[stride[0] * c + stride[1] * y + stride[2] * x]) > sens)
+						img2_float[stride2[0] * c + stride2[1] * y + stride2[2] * x]) > sens)
 							diff++;
 	}
 	if(img1_byte)
@@ -2670,7 +2674,7 @@ static int lua_diffimages(lua_State * L)
 			for(y = 0; y < size[1]; y++)
 				for(x = 0; x < size[2]; x++)
 					if(abs(img1_byte[stride[0] * c + stride[1] * y + stride[2] * x] -
-						img2_byte[stride[0] * c + stride[1] * y + stride[2] * x]) > sens)
+						img2_byte[stride2[0] * c + stride2[1] * y + stride2[2] * x]) > sens)
 							diff++;
 	}
 	if(loglevel >= 5)
