@@ -10,6 +10,7 @@ LIBOPTS = -shared -L$(TORCH)/lib/lua/5.1 -L$(TORCH)/lib
 CFLAGS = -O3 -c -fpic -Wall
 VIDEODEC_FILES = video_decoder.o mpjpeg.o
 FASTIMAGE_FILES = fastimage.o
+CC_FILES = 8cc.o
 CC = gcc
 
 #Lua has its own libjpeg.so which confuses the linker if we simply use -ljpeg
@@ -37,7 +38,7 @@ ifeq ($(NEWFFMPEG),1)
 endif
 
 .PHONY : all
-all : libvideo_decoder.so fastimage.so
+all : libvideo_decoder.so fastimage.so lib8cc.so
 
 .c.o :
 	$(CC) $(CFLAGS) $(INCLUDE) $<
@@ -48,12 +49,18 @@ libvideo_decoder.so : $(VIDEODEC_FILES)
 fastimage.so : $(FASTIMAGE_FILES)
 	$(CC) $(FASTIMAGE_FILES) $(LIBOPTS) -o $@ $(LDFLAGS)
 
+lib8cc.so : $(CC_FILES)
+	$(CC) $(CC_FILES) $(LIBOPTS) -o $@ $(LDFLAGS)
+
 install : libvideo_decoder.so
-	cp libvideo_decoder.so fastimage.so $(TORCH)/lib/lua/5.1/
+	cp libvideo_decoder.so fastimage.so lib8cc.so $(TORCH)/lib/lua/5.1/
 
 uninstall :
-	rm $(TORCH)/lib/lua/5.1/libvideo_decoder.so $(TORCH)/lib/lua/5.1/fastimage.so
+	rm $(TORCH)/lib/lua/5.1/libvideo_decoder.so \
+		$(TORCH)/lib/lua/5.1/fastimage.so \
+		$(TORCH)/lib/lua/5.1/lib8cc.so
+	
 
 .PHONY : clean
 clean :
-	rm -f *.o libvideo_decoder.so fastimage.so
+	rm -f *.o libvideo_decoder.so fastimage.so lib8cc.so
