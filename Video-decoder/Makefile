@@ -53,12 +53,13 @@ lib8cc.so : $(CC_FILES)
 	$(CC) $(CC_FILES) $(LIBOPTS) -o $@ $(LDFLAGS)
 
 install : libvideo_decoder.so
-	cp libvideo_decoder.so fastimage.so lib8cc.so $(TORCH)/lib/lua/5.1/
+	cp libvideo_decoder.so fastimage.so $(TORCH)/lib/lua/5.1/
+	cp lib8cc.so $(TORCH)/lib
 
 uninstall :
 	rm $(TORCH)/lib/lua/5.1/libvideo_decoder.so \
 		$(TORCH)/lib/lua/5.1/fastimage.so \
-		$(TORCH)/lib/lua/5.1/lib8cc.so
+		$(TORCH)/lib/lib8cc.so
 	
 
 .PHONY : clean
