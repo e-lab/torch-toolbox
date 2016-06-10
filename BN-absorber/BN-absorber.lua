@@ -36,6 +36,8 @@ local function BN_absorber(x)
          BN_absorber(x.modules[i])
       elseif x.modules[i].__typename == 'nn.ModelParallel' then
          BN_absorber(x.modules[i])
+      elseif x.modules[i].__typename == 'nn.ConcatTable' then
+         BN_absorber(x.modules[i])
       else
          -- check BN
          if x.modules[i].__typename == 'nn.SpatialBatchNormalization' then

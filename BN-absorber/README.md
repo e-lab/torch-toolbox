@@ -7,3 +7,10 @@ It can be absorbed in following convolution layer by manipulating its weights an
 ### Example
 
 Run the script `th example.lua`.
+
+To convert user model and save as model.net
+```bash
+
+th convert.lua user_model.net
+
+```
