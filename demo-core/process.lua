@@ -54,9 +54,11 @@ local function scalebatch(img, eye, stat, scaledimg)
       else
          scaledimg[i] = image.scale(img[i], w, h)
       end
-      for c = 1,3 do
-         scaledimg[i][c]:add(-stat.mean[c])
-         scaledimg[i][c]:div(stat.std [c])
+      if stat and stat.mean and stat.std then
+         for c = 1,3 do
+            scaledimg[i][c]:add(-stat.mean[c])
+            scaledimg[i][c]:div(stat.std [c])
+         end
       end
    end
    return scaledimg
@@ -66,10 +68,12 @@ end
 -- Normalize a batch of images
 local function normalizebatch(img, stat)
 
-   for i = 1, img:size(1) do
-      for c = 1,3 do
-         img[i][c]:add(-stat.mean[c])
-         img[i][c]:div(stat.std [c])
+   if stat and stat.mean and stat.std then
+      for i = 1, img:size(1) do
+         for c = 1,3 do
+            img[i][c]:add(-stat.mean[c])
+            img[i][c]:div(stat.std [c])
+         end
       end
    end
 
@@ -185,7 +189,8 @@ end
 
    network fields
       model       model
-      stat        stat.mean and stat.std
+      mean        mean
+      std         std
 
 --]]
 function process:init(opt, source, network)
@@ -212,7 +217,7 @@ function process:init(opt, source, network)
       croprect.y2  = source.h / 2 + minside / 2
    elseif opt.spatial == 1 or opt.spatial == 2 then
       local spatial = assert(require('spatial'))
-      network.model = spatial:init(opt, network.model, source)
+      network.net = spatial:init(opt, network.net, source)
    else
       error('Spatial mode must be 0, 1 and 2')
    end
@@ -220,7 +225,7 @@ function process:init(opt, source, network)
    if opt.platform == 'cuda' then
       assert(require('cunn'))
       cuda = true
-      network.model:cuda()
+      network.net:cuda()
    elseif opt.platform ~= 'cpu' then
       error('Platform can be cpu or cuda')
    end
@@ -232,21 +237,21 @@ function process:init(opt, source, network)
       end
       if motionsensed(img) then
          if opt.spatial == 2 or motionmode then
-            normalizebatch(img, network.stat)
+            normalizebatch(img, network)
          elseif opt.spatial == 0 then
             cropimg = cropbatch(img, croprect, cropimg)
-            scaledimg = scalebatch(cropimg, eye, network.stat, scaledimg)
+            scaledimg = scalebatch(cropimg, eye, network, scaledimg)
             img = scaledimg
          else -- opt.spatial == 1
-            scaledimg = scalebatch(img, eye, network.stat, scaledimg)
+            scaledimg = scalebatch(img, eye, network, scaledimg)
             img = scaledimg
          end
          if cuda then
-            result = network.model:forward(img:cuda()):float()
+            result = network.net:forward(img:cuda()):float()
          elseif img:size(1) == 1 then
-            result = network.model:forward(img:squeeze(1)) -- OpenBLAS has issues with batches on ARM
+            result = network.net:forward(img:squeeze(1)) -- OpenBLAS has issues with batches on ARM
          else
-            result = network.model:forward(img)
+            result = network.net:forward(img)
          end
          -- Make 4D again
          if result:dim() == 1 then

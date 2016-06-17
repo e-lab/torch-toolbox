@@ -25,3 +25,5 @@ A collection of snippets and libraries for Torch from Purdue [e-Lab](http://engi
  - [Video-decoder](Video-decoder) to receive and decode video from various sources
  - [Video-transmitter](Video-transmitter) to encode and transmit video on the fly
  - [Weight-init](Weight-init) to reset weight and bias to have desired statistics
+ - [demo-core](demo-core) core scripts for the demo-visor
+ - [demo-visor](demo-visor) to process a video or images with a network

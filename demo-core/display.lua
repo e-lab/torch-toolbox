@@ -366,7 +366,7 @@ local function prep_no_gui(opt, source, class_names)
    end
 
    local pfc = function(...) print(string.format(...)) end
-   if not opt.console then
+   if opt.noconsole then
       pfc = function(...) end
    end
 
@@ -436,7 +436,7 @@ end
       targets     targets to localize
       zoom        zoom level (defaults to 1)
       diw         number of iterations for averaging
-      console     print output to console
+      noconsole   don't print output to console
       gui         gui mode
       dv          number of outputs in verbose gui mode
       localize    localization in gui mode
