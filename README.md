@@ -27,3 +27,8 @@ A collection of snippets and libraries for Torch from Purdue [e-Lab](http://engi
  - [Weight-init](Weight-init) to reset weight and bias to have desired statistics
  - [demo-core](demo-core) core scripts for the demo-visor
  - [demo-visor](demo-visor) to process a video or images with a network
+ 
+
+### License
+
+MIT
