@@ -1,5 +1,4 @@
-Copyright (c) 2014-2015 Teradeep Inc. (Eugenio Culurciello)
-Copyright (c) 2011-2015 Purdue University (Eugenio Culurciello)
+Copyright (c) 2011-2016 Purdue University (Eugenio Culurciello)
 Copyright (c) 2011-2014 Idiap Research Institute (Ronan Collobert)
 Copyright (c) 2012-2014 Deepmind Technologies (Koray Kavukcuoglu)
 Copyright (c) 2011-2012 NEC Laboratories America (Koray Kavukcuoglu)
@@ -20,7 +19,7 @@ modification, are permitted provided that the following conditions are met:
    notice, this list of conditions and the following disclaimer in the
    documentation and/or other materials provided with the distribution.
 
-3. Neither the names of Teradeep Inc, Deepmind Technologies, NYU, NEC Laboratories America,
+3. Neither the names of Deepmind Technologies, NYU, NEC Laboratories America, e-Lab
    Purdue University and IDIAP Research Institute nor the names of its contributors may be 
    used to endorse or promote products derived from this software without 
    specific prior written permission.
