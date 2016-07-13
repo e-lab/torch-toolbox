@@ -3,7 +3,7 @@
 This is a quick quide (checklist) of things you need to do to get a `Ubuntu GPU box` up and going.
 
  - [Make a USB bootable drive](#make-a-usb-bootable-drive)
- - Main drive **must** be `dev/sda`, *otherwise it fails*
+ - Main drive **must** be `dev/sda`, *otherwise it fails*. Newer NVMe SSDs that communicate over PCIe, show up as `dev/nvme0`. If selecting to install on such an SSD, disconnect all other SSDs when installing.
  - **NO** *quickBoot / FastBoot* option in the *BIOS*, *otherwise you cannot reboot*
  - [Update *Ubuntu*'s packages, *otherwise you use old stuff*](#update-stuff)
  - [Change kernel] (#Change-kernel)
