@@ -54,6 +54,7 @@ local opt = lapp(title .. [[
 --saveembedding  (default 0)                  Save network output for each image in text (1) or binary, t7 (2) format
 --pyramid                                     Process the images rescaled to several resolutions starting at camRes
 --map            (default -1)                 Show detected zones with higher luminance (-1: disabled, 0:on pyramid max, >0: on that resolution index)
+--verbose        (default true)               Print percentage value and names on left corner
 ]])
 
 pf(Cg..title..Cn)
@@ -120,7 +121,13 @@ end
 if paths.filep(opt.model) then
    network = torch.load(opt.model)
 elseif paths.filep(opt.model .. '/model.net') then
-   network.net = torch.load(opt.model .. '/model.net')
+   model = torch.load(opt.model .. '/model.net')
+   if model.modules[#model].__typename == 'nn.LogSoftMax' then
+      model:remove(#model)
+      model:add(nn.SoftMax():float())
+   end
+   print(model)
+   network.net = model
    if paths.filep(opt.model .. '/categories.txt') then
       readCatCSV(opt.model .. '/categories.txt')
    elseif paths.filep(opt.model .. '/classes.t7') then

@@ -109,24 +109,22 @@ local function prep_verbose(opt, source, class_names)
             end
          end
       end
-
-      --[[
-      -- verbose list on right:
-      for i = 1, top_n  do
-         local move_to_y = text_y*(2+i)
-         win:moveto(text_x1, move_to_y)
-         if targets == nil or targets == '' then
-            win:show(string.format('%s ', class_names[ idx[i] ]))
-            win:moveto(text_x2, move_to_y)
-            win:show(string.format('(%3.0f%s)', results_mean[ idx[i] ] * 100, '%'))
-         else
-            win:show(string.format('%s ', targets_names[i]))
-            win:moveto(text_x2, move_to_y)
-            win:show(string.format('(%3.0f%s)', targets_prob[i] * 100, '%'))
+      if opt.verbose then
+         -- verbose list on right:
+         for i = 1, top_n  do
+            local move_to_y = text_y*(2+i)
+            win:moveto(text_x1, move_to_y)
+            if targets == nil or targets == '' then
+               win:show(string.format('%s ', class_names[ idx[i] ]))
+               win:moveto(text_x2, move_to_y)
+               win:show(string.format('(%3.0f%s)', results_mean[ idx[i] ] * 100, '%'))
+            else
+               win:show(string.format('%s ', targets_names[i]))
+               win:moveto(text_x2, move_to_y)
+               win:show(string.format('(%3.0f%s)', targets_prob[i] * 100, '%'))
+            end
          end
       end
-      --]]
-
       -- report fps
       win:moveto(10*z, win_h-10*z - 30*z)
       win:setcolor(1, 1, 1)
