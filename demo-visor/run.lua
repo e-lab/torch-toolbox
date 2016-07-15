@@ -117,6 +117,16 @@ local function readClasses(filePath)
       lineno = lineno + 1
    end
 end
+local function readAux(filePath)
+   network.labels = {}
+   local lineno = 1
+   local file = torch.load(filePath)
+   print(file.classes[1])
+   for i = 1, #file.classes do
+      network.labels[lineno] = file.classes[lineno]
+      lineno = lineno + 1
+   end
+end
 -- Loading neural network:
 if paths.filep(opt.model) then
    network = torch.load(opt.model)
@@ -126,12 +136,14 @@ elseif paths.filep(opt.model .. '/model.net') then
       model:remove(#model)
       model:add(nn.SoftMax():float())
    end
-   print(model)
    network.net = model
+   print(opt.model .. '/aux.t7')
    if paths.filep(opt.model .. '/categories.txt') then
       readCatCSV(opt.model .. '/categories.txt')
    elseif paths.filep(opt.model .. '/classes.t7') then
       readClasses(opt.model .. '/classes.t7')
+   elseif paths.filep(opt.model .. '/aux.t7') then
+      readAux(opt.model .. '/aux.t7')
    else
       error('no categories.txt file found in directory: ' .. opt.model)
    end
