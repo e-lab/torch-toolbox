@@ -44,6 +44,22 @@ local function prep_libvideo_decoder_camera(opt, source)
 
 end
 
+local function prep_livecam(opt, source)
+
+   local cam = require 'livecam'
+   local status = false
+   cam.capture('/dev/video'..opt.cam, source.w, source.h, source.fps)
+   local img_tmp = torch.FloatTensor(3, source.h, source.w)
+
+   -- set frame forward function
+   frame.forward = function(img)
+      cam.frame_rgb(img_tmp)
+      return img_tmp
+   end
+   source.cam = cam
+
+end
+
 --[[
    opt fields
       is          eye size
@@ -59,6 +75,8 @@ function frame:init(opt, source)
    opt.cam = tonumber(string.sub(opt.input,4,-1)) -- opt.input is in the format cam0
    if sys.OS == 'macos' then
       prep_lua_camera(opt, source)
+   elseif opt.livecam then
+      prep_livecam(opt, source)
    else
       prep_libvideo_decoder_camera(opt, source)
    end

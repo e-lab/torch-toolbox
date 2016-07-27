@@ -23,8 +23,12 @@ local Cn = sys.COLORS.none
 
 -- Title definition -----------------------------------------------------------
 title = [[
- **** e-lab visor demo ****
- ]]
+          _         _    
+  ___ ___| |   __ _| |__ 
+ / -_)___| |__/ _` | '_ \
+ \___|   |____\__,_|_.__/
+                         
+]]
 
 -- Options ---------------------------------------------------------------------
 local opt = lapp(title .. [[
@@ -55,6 +59,9 @@ local opt = lapp(title .. [[
 --pyramid                                     Process the images rescaled to several resolutions starting at camRes
 --map            (default -1)                 Show detected zones with higher luminance (-1: disabled, 0:on pyramid max, >0: on that resolution index)
 --verbose        (default true)               Print percentage value and names on left corner
+--fixedcam                                    Fixed cam mode
+--livecam                                     Use livecam instead of QT for fixedcam mode
+--fullscreen                                  Fullscreen (requires livecam)
 ]])
 
 pf(Cg..title..Cn)
@@ -111,7 +118,6 @@ local function readClasses(filePath)
    network.labels = {}
    local lineno = 1
    local file = torch.load(filePath)
-   print(file)
    for i = 1, #file do
       network.labels[lineno] = file[lineno]
       lineno = lineno + 1
@@ -121,7 +127,6 @@ local function readAux(filePath)
    network.labels = {}
    local lineno = 1
    local file = torch.load(filePath)
-   print(file.classes[1])
    for i = 1, #file.classes do
       network.labels[lineno] = file.classes[lineno]
       lineno = lineno + 1
@@ -137,7 +142,6 @@ elseif paths.filep(opt.model .. '/model.net') then
       model:add(nn.SoftMax():float())
    end
    network.net = model
-   print(opt.model .. '/aux.t7')
    if paths.filep(opt.model .. '/categories.txt') then
       readCatCSV(opt.model .. '/categories.txt')
    elseif paths.filep(opt.model .. '/classes.t7') then
@@ -231,9 +235,10 @@ while display.continue() do
    timer:reset()
 
    local result = {}
-   local img
+   local img, objects
    nres = source.resolutions and #source.resolutions or 1
    local term = false
+
    for res_idx = 1,nres do
       if motion then
          src = process.motionframe(src, frame)
@@ -255,7 +260,7 @@ while display.continue() do
       end
 
       if res_idx == 1 then
-         result[1], img = process.forward(src)
+         result[1], img, objects = process.forward(src)
       else
          result[res_idx] = process.forward(src)
       end
@@ -303,7 +308,7 @@ while display.continue() do
             -- Never use localize without first doing expandconvresult, it will get all the coordinates wrong, check with two-people.jpg
             res = vid.expandconvresult(result[1][i], opt.is / downs - 1)
          else
-            res = result[1][i]
+            res = result[1] and result[1][i] or nil
          end
          if opt.map >= 0 then
             local t = image.scale(res[mapidx], img:size(4), img:size(3), 'simple')
@@ -311,7 +316,7 @@ while display.continue() do
             img[i][2] = img[i][2]:cmul(t)
             img[i][3] = img[i][3]:cmul(t)
          end
-         display.forward(res, img[i], (img:size(1)/t_loop))
+         display.forward(res, img[i], (img:size(1)/t_loop), objects)
       end
       if opt.saveembedding > 0 and isimage then
          saveembedding(result[1][i], opt.batch == 1 and filenames.filename or filenames[i].filename)
