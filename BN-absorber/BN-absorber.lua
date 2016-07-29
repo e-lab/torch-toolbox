@@ -23,6 +23,14 @@ local absorb_bn_deconv = function (w, b, mean, invstd, affine, gamma, beta)
 end
 
 
+local backward_compat_running_std = function(x, i)
+   if x.modules[i].running_std then
+      x.modules[i].running_var = x.modules[i].running_std:pow(-2):add(-x.modules[i].eps)
+      x.modules[i].running_std = nil
+   end
+end
+
+
 local function BN_absorber(x)
    local i = 1
    while (i <= #x.modules) do
@@ -41,13 +49,14 @@ local function BN_absorber(x)
       else
          -- check BN
          if x.modules[i].__typename == 'nn.SpatialBatchNormalization' then
+            backward_compat_running_std(x, i)
             if x.modules[i-1] and
               (x.modules[i-1].__typename == 'nn.SpatialConvolution' or
                x.modules[i-1].__typename == 'nn.SpatialConvolutionMM') then
                absorb_bn_conv(x.modules[i-1].weight,
                               x.modules[i-1].bias,
                               x.modules[i].running_mean,
-                              x.modules[i].running_var:clone():sqrt():add(x.modules[i].eps):pow(-1),
+                              x.modules[i].running_var:clone():add(x.modules[i].eps):pow(-0.5),
                               x.modules[i].affine,
                               x.modules[i].weight,
                               x.modules[i].bias)
@@ -58,7 +67,7 @@ local function BN_absorber(x)
                absorb_bn_deconv(x.modules[i-1].weight,
                                 x.modules[i-1].bias,
                                 x.modules[i].running_mean,
-                                x.modules[i].running_var:clone():sqrt():add(x.modules[i].eps):pow(-1),
+                                x.modules[i].running_var:clone():add(x.modules[i].eps):pow(-0.5),
                                 x.modules[i].affine,
                                 x.modules[i].weight,
                                 x.modules[i].bias)
@@ -68,12 +77,13 @@ local function BN_absorber(x)
                assert(false, 'Convolution module must exist right before batch normalization layer')
             end
          elseif x.modules[i].__typename == 'nn.BatchNormalization' then
+            backward_compat_running_std(x, i)
             if x.modules[i-1] and
               (x.modules[i-1].__typename == 'nn.Linear') then
                absorb_bn_conv(x.modules[i-1].weight,
                               x.modules[i-1].bias,
                               x.modules[i].running_mean,
-                              x.modules[i].running_std,
+                              x.modules[i].running_var:clone():add(x.modules[i].eps):pow(-0.5),
                               x.modules[i].affine,
                               x.modules[i].weight,
                               x.modules[i].bias)
