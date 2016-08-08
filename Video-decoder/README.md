@@ -9,7 +9,7 @@ It decodes a video and display image frames.
 This library requires libav. To install it on Linux,
 
 ```sh
-sudo apt-get install -y libavformat-dev libavutil-dev libavcodec-dev libswscale-dev
+sudo apt-get install -y libavformat-dev libavutil-dev libavcodec-dev libswscale-dev libfreetype6-dev
 ```
 
 On Mac,
