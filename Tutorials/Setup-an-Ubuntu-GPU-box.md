@@ -6,7 +6,6 @@ This is a quick quide (checklist) of things you need to do to get a `Ubuntu GPU 
  - Main drive **must** be `dev/sda`, *otherwise it fails*. Newer NVMe SSDs that communicate over PCIe, show up as `dev/nvme0`. If selecting to install on such an SSD, disconnect all other SSDs when installing.
  - **NO** *quickBoot / FastBoot* option in the *BIOS*, *otherwise you cannot reboot*
  - [Update *Ubuntu*'s packages, *otherwise you use old stuff*](#update-stuff)
- - [Change kernel] (#Change-kernel)
  - [Install `git`, `vim`, `tmux`, `htop` and `tree`, *otherwise nothing works*](#install-essentials)
  - [Add *exFAT* file system read/write support](#add-exfat-fs-support)
  - [Update terminal's colours, configurations and substitute `<Caps lock>` with additional `<Ctrl>`](#better-configuration), *otherwise it looks and feels like s*\*\**t*
@@ -50,17 +49,6 @@ sudo apt-get update
 sudo apt-get dist-upgrade -y
 sudo apt-get autoremove -y
 ```
-### Change-kernel
-
-```bash
-sudo apt-get install linux-image-x.x.x-x-generic linux-headers-x.x.x-x-generic linux-image-extra-x.x.x-x-generic
-```
-And boot with grub to select kernel version if it's not latest kernel
-```bash
-sudo vim /etc/default/grub
-```
-set GRUB_HIDDEN_TIMEOUT=-5
-Go [here](http://askubuntu.com/questions/82140/how-can-i-boot-with-an-older-kernel-version), and found grub for detail. 
 
 ### Install essentials
 
