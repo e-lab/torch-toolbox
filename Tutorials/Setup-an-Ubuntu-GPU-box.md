@@ -119,17 +119,6 @@ sudo ./NVIDIA-Linux-x86_64-352.41.run --no-opengl-files
 sudo reboot
 ```
 
-## Install nccl library
-
-```bash
-cd ~/Downloads
-git clone https://github.com/NVIDIA/nccl
-cd nccl
-make install
-sudo ldconfig
-luarocks install nccl
-```
-
 ## Edit Terminal's settings
 
 `Edit` -> `Profile Preferences` -> `Scrolling` -> check `Unlimited`.
