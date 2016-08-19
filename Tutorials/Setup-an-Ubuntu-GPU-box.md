@@ -41,9 +41,7 @@ diskutil list
 dd if=./ubuntu-image.dmg of=/dev/diskNB bs=1m
 ```
 
-## After Installation
-
-### Update stuff
+## Update stuff
 
 ```bash
 sudo apt-get update
@@ -51,35 +49,35 @@ sudo apt-get dist-upgrade -y
 sudo apt-get autoremove -y
 ```
 
-### Install essentials
+## Install essentials
 
 ```bash
 sudo apt-get install -y git vim tmux htop tree
 ```
 
-### Add *exFAT* FS support
+## Add *exFAT* FS support
 
 ```bash
 sudo apt-get install -y exfat-utils exfat-fuse
 ```
 
-### Better configuration
+## Better configuration
 
 Go [here](https://github.com/Atcold/Unix-dot-files), and go through it.
 
-### Assign **static IP**
+## Assign **static IP**
 
 `Network Connection` -> `Edit...` -> `IPv4 Settings` -> `Method:` -> `Manual` -> `Add`.
 To get the *IP address* of your *name* you can `ping` it in the terminal (`ping <myStaticName.ecn.purdue.edu>`).
 Configurations for *DNS servers*, *gateway* and *sub-net mask* can be found on the corresponding [ECN webpage](https://engineering.purdue.edu/ECN/Support/KB/Docs/IPSettings).
 
-### Install a `ssh` server
+## Install a `ssh` server
 
 ```bash
 sudo apt-get install -y openssh-server
 ```
 
-### Install *CUDA Toolkit*
+## Install *CUDA Toolkit*
 
 Let's download the latest *CUDA Toolkit* available from [*nVIDIA* website](https://developer.nvidia.com/cuda-downloads) for your *Ubuntu* version. `ssh` remotely from another machine (or use a virtual console with `<Ctrl>`-`<Alt>`-`F1` to `F6`).
 
@@ -106,7 +104,7 @@ You can try to run one of the *Samples* to test if everything went well. Before 
 
 If you made any mistake and you want to uninstall CUDA Toolkit, then run the uninstall script in `/usr/local/cuda-7.5/bin`. To uninstall NVIDIA driver, run `NVIDIA-Linux-x86-310.19.run --uninstall`.
 
-### Update graphics driver
+## Update graphics driver
 
 Check if your drivers are up to date (compare what you get with `nvidia-smi` with what you can find on [*nVIDIA* webpage](http://www.nvidia.com/Download/index.aspx)).
 If they are not, update your system like you just did for installing the *CUDA Toolkit* but with the driver `run` package instead.
@@ -115,14 +113,16 @@ As mentioned before, if you are planning to use your integrated graphic card for
 
 ```bash
 sudo service lightdm stop
-cd Downloads
+cd ~/Downloads
 chmod +x NVIDIA*
 sudo ./NVIDIA-Linux-x86_64-352.41.run --no-opengl-files
 sudo reboot
 ```
-### Install nccl library
+
+## Install nccl library
 
 ```bash
+cd ~/Downloads
 git clone https://github.com/NVIDIA/nccl
 cd nccl
 make install
@@ -130,28 +130,14 @@ sudo ldconfig
 luarocks install nccl
 ```
 
-### Edit Terminal's settings
+## Edit Terminal's settings
 
 `Edit` -> `Profile Preferences` -> `Scrolling` -> check `Unlimited`.
 
-### Install OpenBlas
-
-```
-git clone https://github.com/xianyi/OpenBLAS.git
-cd OpenBLAS
-make NO_AFFINITY=1 USE_OPENMP=1
-sudo make install
-PREFIX=${PREFIX-/usr/local}
-export CMAKE_LIBRARY_PATH=/opt/OpenBLAS/include:/opt/OpenBLAS/lib:$CMAKE_LIBRARY_PATH
-```
-### Install Torch7
+## Install Torch7
 
 Torch7 installation instructions have been taken from ['here'](https://github.com/torch/distro).
 
-To install dependencies:
-```bash
-curl -s https://raw.githubusercontent.com/torch/distro/master/install-deps | bash
-```
 Below instructions will clone the Torch repo and install all the basic packages such as `nn`, `cutorch`, `cunn`, `cudnn` (if you have CUDA).
 
 ```bash
@@ -161,7 +147,7 @@ cd ~/torch; bash install-deps;
 ./install.sh
 ```
 
-### Change ownership of `usr/local`
+## Change ownership of `usr/local`
 
 Since `/usr/local` is belonging to the (administrator) user, we enforce this with
 
@@ -169,7 +155,8 @@ Since `/usr/local` is belonging to the (administrator) user, we enforce this wit
 sudo chown -R me:me /usr/local
 sudo rm -rf ~/.cache/luarocks
 ```
-### Mount on boot
+
+## Mount on boot
 
 Go to `Disks` utility, select target disk --> More actions --> Edit Mount Options.
 
