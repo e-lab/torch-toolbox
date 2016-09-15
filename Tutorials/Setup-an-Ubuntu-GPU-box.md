@@ -13,6 +13,7 @@ This is a quick quide (checklist) of things you need to do to get a `Ubuntu GPU 
  - [Install a `ssh` server](#install-a-ssh-server)
  - [Install *CUDA Toolkit*](#install-cuda-toolkit)
  - [Update graphics driver](#update-graphics-driver)
+ - [Install NCCL](#Install NCCL)
  - [Edit Terminal's settings](#edit-terminals-settings)
  - [Install Torch7](#install-torch7)
  - [Change ownership of `usr/local`](#change-ownership-of-usrlocal)
@@ -117,6 +118,22 @@ cd ~/Downloads
 chmod +x NVIDIA*
 sudo ./NVIDIA-Linux-x86_64-352.41.run --no-opengl-files
 sudo reboot
+```
+## Install NCCL
+
+```bash
+git clone https://github.com/NVIDIA/nccl
+cd nccl
+make install
+```
+update library cache
+```bash
+sudo ldconfig
+```
+
+install lua nccl binding
+```bash
+luarocks install nccl
 ```
 
 ## Edit Terminal's settings
