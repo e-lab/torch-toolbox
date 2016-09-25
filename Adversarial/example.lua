@@ -64,4 +64,10 @@ local pred = model:forward(img_adv)
 local val, idx = pred:max(pred:dim())
 print('==> adversarial:', label[ idx[1] ], 'confidence:', val[1])
 
-print('==> mean absolute diff between the original and adversarial images[min/max]:', torch.add(img, -img_adv):abs():mean())
+local img_diff = torch.add(img, -img_adv)
+print('==> mean absolute diff between the original and adversarial images[min/max]:', torch.abs(img_diff):mean())
+
+if pcall(require,'qt') then
+  local img_cat = torch.cat(torch.cat(img, img_adv, 3), img_diff:mul(127), 3)
+  image.display(img_cat)
+end
