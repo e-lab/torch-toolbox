@@ -67,6 +67,9 @@ print('==> adversarial:', label[ idx[1] ], 'confidence:', val[1])
 local img_diff = torch.add(img, -img_adv)
 print('==> mean absolute diff between the original and adversarial images[min/max]:', torch.abs(img_diff):mean())
 
+image.save('img.png', img:mul(std):add(mean):clamp(0,255))
+image.save('img_adv.png', img_adv:mul(std):add(mean):clamp(0,255))
+
 if pcall(require,'qt') then
   local img_cat = torch.cat(torch.cat(img, img_adv, 3), img_diff:mul(127), 3)
   image.display(img_cat)
