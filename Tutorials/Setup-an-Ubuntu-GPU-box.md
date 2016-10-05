@@ -13,7 +13,7 @@ This is a quick quide (checklist) of things you need to do to get a `Ubuntu GPU 
  - [Install a `ssh` server](#install-a-ssh-server)
  - [Install *CUDA Toolkit*](#install-cuda-toolkit)
  - [Update graphics driver](#update-graphics-driver)
- - [Install NCCL](#Install NCCL)
+ - [Install NCCL](#install-nccl)
  - [Edit Terminal's settings](#edit-terminals-settings)
  - [Install Torch7](#install-torch7)
  - [Change ownership of `usr/local`](#change-ownership-of-usrlocal)
