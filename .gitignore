@@ -2,8 +2,8 @@
 .DS_Store
 
 # obj files
-.o
-.so
+*.o
+*.so
 
 # tmp files from vim
 *.sw?
