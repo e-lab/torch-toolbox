@@ -45,7 +45,7 @@ ifeq ($(NEWFFMPEG),1)
 endif
 
 .PHONY : all
-all : libvideo_decoder.so fastimage.so lib8cc.so livecam.so
+all : libvideo_decoder.so fastimage.so lib8cc.so
 
 .c.o :
 	$(CC) $(CFLAGS) $(INCLUDE) $<
@@ -62,17 +62,16 @@ lib8cc.so : $(CC_FILES)
 livecam.so: $(LIVECAM_FILES)
 	$(CC) $(LIVECAM_FILES) $(LIBOPTS) -o $@ $(LIVECAM_LIBS)
 
-install : libvideo_decoder.so fastimage.so lib8cc.so livecam.so
-	cp libvideo_decoder.so fastimage.so livecam.so $(TORCH)/lib/lua/5.1/
+install : libvideo_decoder.so fastimage.so lib8cc.so
+	cp libvideo_decoder.so fastimage.so $(TORCH)/lib/lua/5.1/
 	cp lib8cc.so $(TORCH)/lib
 
 uninstall :
 	rm $(TORCH)/lib/lua/5.1/libvideo_decoder.so \
 		$(TORCH)/lib/lua/5.1/fastimage.so \
-		$(TORCH)/lib/lua/5.1/livecam.so \
 		$(TORCH)/lib/lib8cc.so
 	
 
 .PHONY : clean
 clean :
-	rm -f *.o libvideo_decoder.so fastimage.so lib8cc.so livecam.so
+	rm -f *.o libvideo_decoder.so fastimage.so lib8cc.so 
