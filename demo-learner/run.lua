@@ -26,7 +26,7 @@ local title = [[
 -- Options ---------------------------------------------------------------------
 opt = lapp(title .. [[
 -d, --dmodel     (default '../../models/')   Base Directory models/ where models are stored
--m, --model      (default 'home-basic')      Directory for model.net and categories.txt files
+-m, --model      (default 'generic')         Directory for model.net and categories.txt files
 --is             (default 224)               Neural network eye size
 --camRes         (default QHD)               Camera resolution ([VGA]|FWVGA|HD|FHD)
 --camIdx         (default 0)                 Camera id (0,1,2..)
@@ -68,7 +68,7 @@ end
 
 -- remove last layer (we will not need for learner)
 network.model.modules[#network.model.modules] = nil -- softmax
-network.model.modules[#network.model.modules-1] = nil -- last layer
+network.model.modules[#network.model.modules] = nil -- last layer
 
 -- Loading classes names and also statistics from dataset
 local stat_file = opt.dmodel .. opt.model .. '/'.. 'stat.t7'
