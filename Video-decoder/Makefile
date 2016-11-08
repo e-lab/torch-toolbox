@@ -21,6 +21,10 @@ ifeq ($(UNAME_S),Darwin)
 	LIVECAM_LIBS += -lGL
 	CFLAGS += -DDARWIN
 else ifneq ($(filter aarc% arm%,$(UNAME_P)),)
+	LDFLAGS += /usr/lib/aarch64-linux-gnu/libjpeg.so /usr/lib/aarch64-linux-gnu/libpng.so
+	LIVECAM_LIBS += -lEGL -lGLESv2
+	CFLAGS += -DUSEGLES2
+else ifneq ($(filter arm%,$(UNAME_P)),)
 	LDFLAGS += /usr/lib/arm-linux-gnueabihf/libjpeg.so /usr/lib/arm-linux-gnueabihf/libpng.so
 	LIVECAM_LIBS += -lEGL -lGLESv2
 	CFLAGS += -mfpu=neon -DUSEGLES2
@@ -70,8 +74,8 @@ uninstall :
 	rm $(TORCH)/lib/lua/5.1/libvideo_decoder.so \
 		$(TORCH)/lib/lua/5.1/fastimage.so \
 		$(TORCH)/lib/lib8cc.so
-	
+
 
 .PHONY : clean
 clean :
-	rm -f *.o libvideo_decoder.so fastimage.so lib8cc.so 
+	rm -f *.o libvideo_decoder.so fastimage.so lib8cc.so
