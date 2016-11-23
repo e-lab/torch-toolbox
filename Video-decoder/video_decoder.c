@@ -1172,6 +1172,11 @@ static int video_decoder_init(lua_State * L)
 	lua_pushnumber(L, pCodecCtx->width);
 	if (pFormatCtx->streams[stream_idx]->nb_frames > 0) {
 		lua_pushnumber(L, pFormatCtx->streams[stream_idx]->nb_frames);
+	} else if(pFormatCtx->duration > 0 && pFormatCtx->streams[stream_idx]->avg_frame_rate.den > 0 &&
+		pFormatCtx->streams[stream_idx]->avg_frame_rate.num)
+	{
+		lua_pushnumber(L, pFormatCtx->duration * pFormatCtx->streams[stream_idx]->avg_frame_rate.num /
+			pFormatCtx->streams[stream_idx]->avg_frame_rate.den / 1000000);
 	} else {
 		lua_pushnil(L);
 	}
