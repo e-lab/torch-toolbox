@@ -1,5 +1,10 @@
 # demo vision application
 
+
+## Installation:
+Install:
+https://github.com/e-lab/torch-toolbox/tree/master/Video-decoder
+
 This demo uses demo-core to process some input data with a network.
 The network can be loaded in two formats:
 
